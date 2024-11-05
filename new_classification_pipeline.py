@@ -13,7 +13,7 @@ from xgboost import XGBClassifier
 import datetime as datetime
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix, classification_report
-from models import LSTMModel, DeepLSTMModel, TransformerModel, CNNLSTMModel, CNNModel, DeepCNNModel, DeepCNNLSTMModel
+from classifier_models import LSTMModel, DeepLSTMModel, TransformerModel, CNNLSTMModel, CNNModel, DeepCNNModel, DeepCNNLSTMModel
 from config import classification_config, \
                     heart_rate_features_1, heart_rate_features_2, heart_rate_features_3, heart_rate_features_4, \
                     sleep_features_1, sleep_features_2, sleep_features_3, sleep_features_4, \
