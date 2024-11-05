@@ -5,14 +5,14 @@ classification_config = {
     "LSTMModel": {
         "input_size": 48,       # Number of features per timestep in the input
         "hidden_size": 128,     # Hidden size for LSTM layers
-        "num_layers": 2,        # Number of stacked LSTM layers
-        "dropout": 0.2          # Dropout rate for regularization
+        "dropout": 0.2,         # Dropout rate for regularization
+        "num_classes": 2        # Number of output classes
     },
     "DeepLSTMModel": {
         "input_size": 48,       # Number of features per timestep in the input
         "hidden_size": 256,     # Initial hidden size, progressively reduced in deeper layers
-        "num_layers": 4,        # Number of stacked LSTM layers
-        "dropout": 0.3          # Dropout rate for regularization across layers
+        "dropout": 0.3,         # Dropout rate for regularization across layers
+        "num_classes": 2        # Number of output classes
     },
     "TransformerModel": {
         "input_size": 48,             # Number of features per timestep
@@ -21,37 +21,38 @@ classification_config = {
         "num_encoder_layers": 4,      # Number of Transformer encoder layers
         "dim_feedforward": 512,       # Size of the feedforward layer in each encoder block
         "dropout": 0.1,               # Dropout rate for regularization
-        "max_seq_length": 500         # Maximum sequence length for positional encoding
+        "max_seq_length": 500,        # Maximum sequence length for positional encoding
+        "num_classes": 2              # Number of output classes
     },
     "CNNLSTMModel": {
         "input_size": 48,             # Number of features per timestep
         "num_filters": 64,            # Number of filters in the CNN layer
         "kernel_size": 3,             # Size of the convolutional kernel
         "lstm_hidden_size": 128,      # Hidden size for the LSTM layers
-        "num_lstm_layers": 2,         # Number of stacked LSTM layers
-        "dropout": 0.2                # Dropout rate for regularization
+        "dropout": 0.2,               # Dropout rate for regularization
+        "num_classes": 2              # Number of output classes
     },
     "CNNModel": {
         "input_size": 48,             # Number of features per timestep
         "num_filters": 64,            # Number of filters in the CNN layer
         "kernel_size": 3,             # Size of the convolutional kernel
-        "dropout": 0.2                # Dropout rate for regularization
+        "dropout": 0.2,               # Dropout rate for regularization
+        "num_classes": 2              # Number of output classes
     },
     "DeepCNNModel": {
         "input_size": 48,             # Number of features per timestep
         "num_filters": 64,            # Initial number of filters, doubled with each convolutional layer
         "kernel_size": 3,             # Size of the convolutional kernel
-        "num_conv_layers": 4,         # Number of convolutional layers
-        "dropout": 0.3                # Dropout rate for regularization
+        "dropout": 0.3,               # Dropout rate for regularization
+        "num_classes": 2              # Number of output classes
     },
     "DeepCNNLSTMModel": {
         "input_size": 48,             # Number of features per timestep
         "num_filters": 64,            # Initial number of filters in the CNN layers
         "kernel_size": 3,             # Size of the convolutional kernel
-        "num_conv_layers": 4,         # Number of convolutional layers before LSTM
         "lstm_hidden_size": 128,      # Hidden size for LSTM layers
-        "num_lstm_layers": 2,         # Number of stacked LSTM layers
-        "dropout": 0.3                # Dropout rate for regularization
+        "dropout": 0.3,               # Dropout rate for regularization
+        "num_classes": 2              # Number of output classes
     },
 
     # Classical Machine Learning Models
@@ -82,6 +83,7 @@ classification_config = {
         "random_state": 42            # Seed for reproducibility
     }
 }
+
 
 m_epochs = 100
 
