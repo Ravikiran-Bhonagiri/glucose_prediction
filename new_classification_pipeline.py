@@ -10,7 +10,7 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
-import datetime as datetime
+from datetime import datetime
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix, classification_report
 from classifier_models import LSTMModel, DeepLSTMModel, TransformerModel, CNNLSTMModel, CNNModel, DeepCNNModel, DeepCNNLSTMModel
