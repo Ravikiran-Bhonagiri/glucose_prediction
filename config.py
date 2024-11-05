@@ -9,7 +9,7 @@ classification_config = {
         "num_classes": 2        # Number of output classes
     },
     "DeepLSTMModel": {
-        "input_size": 48,       # Number of features per timestep in the input
+        "input_size": 17,       # Number of features per timestep in the input
         "hidden_size": 256,     # Initial hidden size, progressively reduced in deeper layers
         "dropout": 0.3,         # Dropout rate for regularization across layers
         "num_classes": 2        # Number of output classes
