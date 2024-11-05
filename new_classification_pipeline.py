@@ -87,6 +87,7 @@ def capture_metrics(y_test, y_pred, y_pred_probs, model_name, model_results):
     logging.info(f"{model_name} - Accuracy: {accuracy}, Precision: {precision}, Recall: {recall}, F1 Score: {f1}, AUC-ROC: {auc_roc}")
     return model_results
 
+
 def train_model(model, train_loader, criterion, optimizer, epochs):
     model.train()
     for epoch in range(epochs):
@@ -121,19 +122,51 @@ def evaluate_model(model, data_loader, criterion):
     logging.info(f"Evaluation Loss: {epoch_loss:.4f}")
     return predictions, actuals, probs
 
-def process_deep_model(X_train, X_val, y_train, y_val, model_class, model_params, batch_size, epochs):
-    train_dataset = TensorDataset(torch.tensor(X_train).float(), torch.tensor(y_train).float())
-    val_dataset = TensorDataset(torch.tensor(X_val).float(), torch.tensor(y_val).float())
+def process_deep_model(X_data, y_data, model_class, model_params, batch_size, epochs, test_split=0.2, val_split=0.1):
+    logging.info("Starting process_deep_model function")
+
+    # Convert data to tensors
+    dataset = TensorDataset(torch.tensor(X_data).float(), torch.tensor(y_data).float())
+    logging.info("Data converted to TensorDataset")
+
+    # Calculate sizes for each split
+    test_size = int(test_split * len(dataset))
+    val_size = int(val_split * (len(dataset) - test_size))
+    train_size = len(dataset) - test_size - val_size
+    logging.info(f"Dataset split sizes - Train: {train_size}, Validation: {val_size}, Test: {test_size}")
+
+    # Split the dataset
+    train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
+    logging.info("Data split into training, validation, and test sets")
+
+    # DataLoaders for each set
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size)
+    logging.info("DataLoaders created for train, validation, and test sets")
 
+    # Initialize model, criterion, and optimizer
     model = model_class(**model_params).to(device)
-    criterion = nn.BCEWithLogitsLoss()
+    criterion = nn.BCEWithLogitsLoss()  # Suitable for binary classification
     optimizer = optim.Adam(model.parameters())
+    logging.info(f"Model initialized: {model_class.__name__} with parameters {model_params}")
 
+    # Train the model on the training data
+    logging.info("Starting model training")
     train_model(model, train_loader, criterion, optimizer, epochs)
+    logging.info("Model training completed")
+
+    # Evaluate on validation set
+    logging.info("Evaluating on validation set")
     y_val_pred, y_val_true, y_val_probs = evaluate_model(model, val_loader, criterion)
-    return y_val_pred, y_val_true, y_val_probs
+
+    # Evaluate on test set
+    logging.info("Evaluating on test set")
+    y_test_pred, y_test_true, y_test_probs = evaluate_model(model, test_loader, criterion)
+
+    logging.info("process_deep_model function completed")
+
+    return y_test_pred, y_test_true, y_test_probs
 
 def process_classical_model(X_train, X_val, y_train, y_val, model):
     model.fit(X_train, y_train)
