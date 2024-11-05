@@ -201,12 +201,6 @@ steps_features_4 = [
 
 
 temporal_features = [
-    'minute',
-     'hour',
-     'day_of_week',
-     'day_of_month',
-     'SecondOfMinute_Sin',
-     'SecondOfMinute_Cos',
      'MinuteOfHour_Sin',
      'MinuteOfHour_Cos',
      'HourOfDay_Sin',
