@@ -162,6 +162,7 @@ def pipeline_run(intervals, output_data_scaled, interval_split, feature_size, m_
 
     for model_name, (model_class, model_params) in deep_models.items():
         logging.info(f"Starting {model_name} model training")
+        print(f"Starting {model_name} model training")
         for fold, (train_index, val_index) in enumerate(skf.split(intervals, output_data_scaled.flatten())):
             logging.info(f"Processing Fold {fold + 1}")
             X_train, X_val = intervals[train_index], intervals[val_index]
