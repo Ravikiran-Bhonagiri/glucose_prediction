@@ -289,6 +289,7 @@ for index, features in enumerate(list_of_features):
         # Manually format and log model results with mean and std deviation
         for model_name, metrics in model_results.items():
             logging.info(f"Model: {model_name}")
+            print(f"Model: {model_name}")
             
             # Log each metric with comma-separated values and compute mean and std
             for metric_name in ['Accuracy', 'Precision', 'Recall', 'F1_Score']:
