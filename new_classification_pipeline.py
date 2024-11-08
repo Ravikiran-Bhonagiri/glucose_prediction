@@ -15,10 +15,10 @@ import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix, classification_report
 from classifier_models import LSTMModel, DeepLSTMModel, TransformerModel, CNNLSTMModel, CNNModel, DeepCNNModel, DeepCNNLSTMModel
 from config import classification_config, \
-                    heart_rate_features_1, heart_rate_features_2, heart_rate_features_3, heart_rate_features_4, \
-                    sleep_features_1, sleep_features_2, sleep_features_3, sleep_features_4, \
-                    intensity_features_1, intensity_features_2, intensity_features_3, intensity_features_4, \
-                    steps_features_1, steps_features_2, steps_features_3, steps_features_4, temporal_features, m_epochs, ids
+                    heart_rate_features_1, heart_rate_features_2, heart_rate_features_3, heart_rate_features_4, heart_rate_features_5, \
+                    sleep_features_1, sleep_features_2, sleep_features_3, sleep_features_4, sleep_features_5,  \
+                    intensity_features_1, intensity_features_2, intensity_features_3, intensity_features_4, intensity_features_5, \
+                    steps_features_1, steps_features_2, steps_features_3, steps_features_4, steps_features_5,  temporal_features, m_epochs, ids
 
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder, StandardScaler
 
