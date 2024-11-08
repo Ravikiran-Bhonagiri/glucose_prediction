@@ -458,7 +458,7 @@ for id_, model_results in results.items():
     for model_name, metrics in model_results.items():
         # Convert confusion matrix and classification report to strings (for storage in CSV)
         confusion_matrix_str = str(metrics['Confusion_Matrix'])  # Store confusion matrix as string
-        classification_report_str = metrics['Classification_Report'][0] if isinstance(metrics['Classification_Report'], list) else str(metrics['Classification_Report'])
+        #classification_report_str = metrics['Classification_Report'][0] if isinstance(metrics['Classification_Report'], list) else str(metrics['Classification_Report'])
         
         csv_data.append({
             "ID": id_,
@@ -472,7 +472,7 @@ for id_, model_results in results.items():
             "Recall List": metrics['Recall'],
             "F1_Score List": metrics['F1_Score'],
             "Confusion Matrix": confusion_matrix_str,  # Adding confusion matrix as a string
-            "Classification Report": classification_report_str  # Adding classification report as a string
+            #"Classification Report": classification_report_str  # Adding classification report as a string
         })
 
 # Convert to DataFrame and save as CSV
