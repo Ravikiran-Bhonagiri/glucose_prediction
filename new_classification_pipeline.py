@@ -158,9 +158,9 @@ def pipeline_run(intervals, output_data_scaled, m_epochs, model_results, classif
             logging.info("Data split into training, validation, and test sets")
             
             # Convert datasets to PyTorch tensors
-            train_dataset = TensorDataset(torch.tensor(X_train).float(), torch.tensor(y_train).float())
-            val_dataset = TensorDataset(torch.tensor(X_val).float(), torch.tensor(y_val).float())
-            test_dataset = TensorDataset(torch.tensor(X_test).float(), torch.tensor(y_test).float())
+            train_dataset = TensorDataset(torch.tensor(X_train).float(), torch.tensor(y_train).long())
+            val_dataset = TensorDataset(torch.tensor(X_val).float(), torch.tensor(y_val).long())
+            test_dataset = TensorDataset(torch.tensor(X_test).float(), torch.tensor(y_test).long())
             
             # Create DataLoaders for train, validation, and test sets
             train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
