@@ -326,7 +326,7 @@ def intialize_model_metrics(model_names_with_tags):
 results = {}
 
 # Loop through each ID and perform the data processing and model evaluation
-for index, features in enumerate(list_of_features[3:]):
+for index, features in enumerate(list_of_features):
     logging.info(f"Processing features: {features} \n")
 
     classification_config = set_input_size(classification_config, len(features))
