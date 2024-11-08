@@ -31,6 +31,10 @@ from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 import numpy as np
 import logging
+import warnings
+
+# Ignore all warnings
+warnings.filterwarnings("ignore")
 
 
 
