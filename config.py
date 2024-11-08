@@ -86,7 +86,7 @@ classification_config = {
 
 
 
-m_epochs = 1
+m_epochs = 100
 
 # Define the list of IDs
 # ids = ["MMCS0002", "MMCS0003", "MMCS0005", "MMCS0007", "MMCS0008", "MMCS0009", "MMCS0010", "MMCS0011", "MMCS0016"]
