@@ -224,6 +224,19 @@ def pipeline_run(intervals, output_data_scaled, interval_split, feature_size, m_
     return model_results
 
 
+def load_dataframe_from_npy(file_path):
+    # Load the dictionary from the .npy file
+    data_dict = np.load(file_path, allow_pickle=True).item()
+    
+    # Extract columns and data
+    columns = data_dict['columns']
+    data = data_dict['data']
+    
+    # Reconstruct the DataFrame
+    df = pd.DataFrame(data, columns=columns)
+    return df
+
+
 list_of_features = [ features_1, features_2, features_3, features_4]
 
 interval_split = 48
@@ -255,12 +268,12 @@ for index, features in enumerate(list_of_features):
         logging.info(f"Processing ID: {id_}")
         
         # Load the combined data tuple from the .npy file for the current ID
-        file_path = f'/home/rxb2495/data/{id_}_all_data.npy'
-        loaded_data = np.load(file_path, allow_pickle=True)
+        features_data_path = f'/home/rxb2495/Glucose-Forecasting/final_data/{id_}_combined_data.npy'
+        labels_data_path = f'/home/rxb2495/Glucose-Forecasting/final_data/{id_}_main_data.npy'
 
         # Reconstruct DataFrames from the loaded data
-        intervals = pd.DataFrame(data=loaded_data[0][1], columns=loaded_data[0][0])
-        output_data = pd.DataFrame(data=loaded_data[1][1], columns=loaded_data[1][0])
+        intervals = load_dataframe_from_npy(features_data_path)
+        output_data = load_dataframe_from_npy(labels_data_path)
 
         # Handle missing values
         if output_data.isnull().values.any():
