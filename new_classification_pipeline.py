@@ -181,60 +181,81 @@ def pipeline_run(intervals, output_data_scaled, m_epochs, model_results, classif
 
                 # Training phase
                 for i, (X_batch, y_batch) in enumerate(train_loader):
-                    
                     X_batch, y_batch = X_batch.to(device), y_batch.to(device)
-
-                    print(f"Batch {i+1}: X_batch shape: {X_batch.shape}, y_batch shape: {y_batch.shape}")
                     
+                    # Ensure y_batch has the correct shape (batch_size, 1)
+                    y_batch = y_batch.view(-1, 1)
+
+                    # Forward pass
                     optimizer.zero_grad()
-                    outputs = model(X_batch)
-                    loss = criterion(outputs.squeeze(), y_batch)
+                    outputs = model(X_batch)  # Output shape: (batch_size, 1)
+                    
+                    # Calculate the loss
+                    loss = criterion(outputs, y_batch)
                     loss.backward()
                     optimizer.step()
                     running_loss += loss.item() * X_batch.size(0)
 
+                    # Debugging information
+                    print(f"Batch {i+1}: X_batch shape: {X_batch.shape}, y_batch shape: {y_batch.shape}, outputs shape: {outputs.shape}")
+
+                # Calculate and log average training loss for the epoch
                 train_loss = running_loss / len(train_loader.dataset)
                 logging.info(f"Epoch [{epoch + 1}/{m_epochs}] - Train Loss: {train_loss:.4f}")
 
-                # Validation phase
+                # --------------------
+                # Validation Phase
+                # --------------------
                 model.eval()
                 val_loss, val_pred, val_true, val_probs = 0.0, [], [], []
                 with torch.no_grad():
                     for X_batch, y_batch in val_loader:
                         X_batch, y_batch = X_batch.to(device), y_batch.to(device)
+                        y_batch = y_batch.view(-1, 1)  # Ensure y_batch has shape (batch_size, 1)
+
                         outputs = model(X_batch)
-                        loss = criterion(outputs.squeeze(), y_batch)
+                        loss = criterion(outputs, y_batch)
                         val_loss += loss.item() * X_batch.size(0)
                         
-                        preds = torch.round(torch.sigmoid(outputs)).cpu().numpy()
+                        # Apply sigmoid to get probabilities
+                        probs = torch.sigmoid(outputs).cpu().numpy()
+                        preds = (probs > 0.5).astype(int)  # Convert probabilities to binary predictions
                         val_pred.extend(preds)
                         val_true.extend(y_batch.cpu().numpy())
-                        val_probs.extend(torch.sigmoid(outputs).cpu().numpy())
-                
+                        val_probs.extend(probs)
+
+                # Calculate validation metrics
                 val_loss /= len(val_loader.dataset)
                 val_accuracy = np.mean(np.array(val_pred) == np.array(val_true))
                 logging.info(f"Epoch [{epoch + 1}/{m_epochs}] - Val Loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.4f}")
 
-            # Test evaluation after training
+            # --------------------
+            # Test Evaluation After Training
+            # --------------------
             model.eval()
             test_pred, test_true, test_probs = [], [], []
             test_loss = 0.0
             with torch.no_grad():
                 for X_batch, y_batch in test_loader:
                     X_batch, y_batch = X_batch.to(device), y_batch.to(device)
+                    y_batch = y_batch.view(-1, 1)  # Ensure y_batch has shape (batch_size, 1)
+
                     outputs = model(X_batch)
-                    loss = criterion(outputs.squeeze(), y_batch)
+                    loss = criterion(outputs, y_batch)
                     test_loss += loss.item() * X_batch.size(0)
                     
-                    preds = torch.round(torch.sigmoid(outputs)).cpu().numpy()
+                    # Apply sigmoid to get probabilities
+                    probs = torch.sigmoid(outputs).cpu().numpy()
+                    preds = (probs > 0.5).astype(int)
                     test_pred.extend(preds)
                     test_true.extend(y_batch.cpu().numpy())
-                    test_probs.extend(torch.sigmoid(outputs).cpu().numpy())
-            
+                    test_probs.extend(probs)
+
+            # Calculate and log test metrics
             test_loss /= len(test_loader.dataset)
             test_accuracy = np.mean(np.array(test_pred) == np.array(test_true))
             logging.info(f"{model_name} - Fold {fold + 1} Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.4f}")
-            
+
             # Capture metrics for the current fold
             model_results = capture_metrics(test_true, test_pred, test_probs, f"{model_name} (Test)", model_results)
 
@@ -357,28 +378,32 @@ for index, features in enumerate(list_of_features):
         intervals = intervals.astype(np.float32)
         output_data = output_data.astype(np.float32)
 
-        # Create categorical bins for binary classification
-        bins = [0, 100, float('inf')]  # 0-100 is one class, >100 is the second class
+       # Step 1: Create categorical bins for binary classification
+        bins = [0, 100, float('inf')]  # Define bins: 0-100 is one class, >100 is the second class
         labels = [0, 1]  # Class 0: 0-100, Class 1: >100
 
-        # Create the new 'Glucose_Category' based on the specified bins
-        output_data['Glucose_Category'] = pd.cut(output_data['Historic Glucose mg/dL'], bins=bins, labels=labels, right=True)
+        # Step 2: Create a new column 'Glucose_Label' based on the specified bins
+        output_data['Glucose_Label'] = pd.cut(
+            output_data['Historic Glucose mg/dL'], 
+            bins=bins, 
+            labels=labels, 
+            right=True
+        ).astype(int)  # Convert to integer type (0 or 1)
 
-        # Encode the categories using LabelEncoder (though not strictly necessary since labels are already 0 and 1)
-        label_encoder = LabelEncoder()
-        output_data['Glucose_Label'] = label_encoder.fit_transform(output_data['Glucose_Category'])
-
+        # Step 3: Check value counts of the new labels for logging
         glucose_label_counts = output_data['Glucose_Label'].value_counts()
-
-        # Convert value counts to dictionary
         glucose_label_counts_dict = glucose_label_counts.to_dict()
 
         # Log the value counts as a dictionary
         logging.info("Glucose_Label value counts (as dictionary):")
         logging.info(f"{glucose_label_counts_dict}")
 
-        # Perform classification
+        # Step 4: Prepare the labels for model training
         output_data_scaled = output_data[["Glucose_Label"]].values.astype(np.float32)
+
+        # Step 5: Reshape the labels to ensure compatibility with BCEWithLogitsLoss
+        # The shape should be (batch_size, 1)
+        output_data_scaled = output_data_scaled.reshape(-1, 1)
 
         logging.info(f"Total size of data: {output_data_scaled.shape[0]}")
 
