@@ -42,8 +42,10 @@ features_3 =  features_2 + heart_rate_features_3 + sleep_features_3 + intensity_
 
 features_4 =  features_3 + heart_rate_features_4 + sleep_features_4 + intensity_features_4 + steps_features_4
 
+features_5 =  features_4 + heart_rate_features_5 + sleep_features_5 + intensity_features_5 + steps_features_5
 
-list_of_features = [ features_1, features_2, features_3, features_4]
+
+list_of_features = [ features_1, features_2, features_3, features_4, features_5]
 
 # Code to split into intervals
 def split_into_intervals(data, interval_size, stride):
