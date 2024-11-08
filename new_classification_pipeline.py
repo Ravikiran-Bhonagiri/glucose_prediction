@@ -337,6 +337,9 @@ for index, features in enumerate(list_of_features):
             logging.warning(f"The intervals DataFrame for {id_} contains NaN values.")
 
         intervals = intervals[features]
+
+        print(intervals.shape)
+        print(intervals.head())
         
         # Prepare output data for classification
         output_data = output_data[["Historic Glucose mg/dL"]]
