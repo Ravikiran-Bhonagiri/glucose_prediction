@@ -63,7 +63,6 @@ classification_config = {
         "subsample": 0.8,
         "colsample_bytree": 0.8,
         "objective": "binary:logistic",
-        "use_label_encoder": False,
         "eval_metric": "logloss"
     },
     "DecisionTree": {
@@ -156,9 +155,7 @@ sleep_features_2 = [
 sleep_features_3 = [
    'Sleep_Lag_5min', 'Sleep_Lag_15min', 'Sleep_Lag_30min',
     'Sleep_Lag_60min', 'Sleep_Lag_120min', 'Sleep_Lag_180min', 'Sleep_Lag_240min',
-    'Sleep_Lag_360min', 'Sleep_Lag_720min', 'Sleep_Lag_1440min', 'Sleep_Lag_Diff_15min',
-    'Sleep_Lag_Diff_30min', 'Sleep_Lag_Diff_60min', 'Sleep_Lag_Diff_90min', 'Sleep_Lag_Diff_180min',
-    'Sleep_Lag_Diff_240min', 'Sleep_Lag_Diff_360min', 'Sleep_Lag_Diff_720min', 'Sleep_Lag_Diff_1440min'
+    'Sleep_Lag_360min', 'Sleep_Lag_720min', 'Sleep_Lag_1440min'
 ]
 
 sleep_features_4 = [
