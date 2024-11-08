@@ -128,13 +128,10 @@ def pipeline_run(intervals, output_data_scaled, m_epochs, model_results, classif
     # Define deep learning models with configurations
     deep_models = {
         'LSTM': (LSTMModel, classification_config['LSTMModel']),
-        'DeepLSTM': (DeepLSTMModel, classification_config['DeepLSTMModel']),
         'Transformer': (TransformerModel, classification_config['TransformerModel']),
         'CNN-LSTM': (CNNLSTMModel, classification_config['CNNLSTMModel']),
         'CNN': (CNNModel, classification_config['CNNModel']),
-        'DeepCNN': (DeepCNNModel, classification_config['DeepCNNModel']),
-        'DeepCNN-LSTM': (DeepCNNLSTMModel, classification_config['DeepCNNLSTMModel'])
-    }
+        }
     
     # Define classical models with configurations
     classical_models = {
