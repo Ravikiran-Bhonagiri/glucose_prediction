@@ -336,8 +336,15 @@ for index, features in enumerate(list_of_features):
         if intervals.isnull().values.any():
             logging.warning(f"The intervals DataFrame for {id_} contains NaN values.")
 
+        
+        print(features)
+        print(len(intervals.columns))
+        
         intervals = intervals[features]
 
+        print(len(intervals.columns))
+
+        print(intervals.columns)
         print(intervals.shape)
         print(intervals.head())
         
