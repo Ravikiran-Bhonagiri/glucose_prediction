@@ -214,7 +214,6 @@ steps_features_4 = [
     'Steps_Lag_Diff_15min_15min_Mean', 'Steps_Lag_Diff_15min_15min_Std',
     'Steps_Lag_Diff_30min_30min_Mean', 'Steps_Lag_Diff_30min_30min_Std',
     'Steps_Lag_Diff_60min_60min_Mean', 'Steps_Lag_Diff_60min_60min_Std',
-    'Steps_Lag_Diff_90min_90min_Mean', 'Steps_Lag_Diff_90min_90min_Std',
     'Steps_Lag_Diff_180min_180min_Mean', 'Steps_Lag_Diff_180min_180min_Std',
     'Steps_Lag_Diff_240min_240min_Mean', 'Steps_Lag_Diff_240min_240min_Std',
     'Steps_Lag_Diff_360min_360min_Mean', 'Steps_Lag_Diff_360min_360min_Std',
