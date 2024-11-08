@@ -342,6 +342,8 @@ for index, features in enumerate(list_of_features):
         
         intervals = intervals[features]
 
+        intervals = intervals.loc[:, ~intervals.columns.duplicated()]
+
         print(len(intervals.columns))
 
         print(intervals.columns)
