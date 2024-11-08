@@ -3,86 +3,88 @@
 classification_config = {
     # Deep Learning Models
     "LSTMModel": {
-        "input_size": 17,       # Number of features per timestep in the input
-        "hidden_size": 128,     # Hidden size for LSTM layers
-        "dropout": 0.2,         # Dropout rate for regularization
-        "num_classes": 2        # Number of output classes
+        "input_size": None,       # Placeholder for input size
+        "hidden_size": 128,
+        "dropout": 0.2,
+        "num_classes": 2
     },
     "DeepLSTMModel": {
-        "input_size": 17,       # Number of features per timestep in the input
-        "hidden_size": 256,     # Initial hidden size, progressively reduced in deeper layers
-        "dropout": 0.3,         # Dropout rate for regularization across layers
-        "num_classes": 2        # Number of output classes
+        "input_size": None,       
+        "hidden_size": 256,
+        "dropout": 0.3,
+        "num_classes": 2
     },
     "TransformerModel": {
-        "input_size": 48,             # Number of features per timestep
-        "d_model": 128,               # Dimension of the model embeddings
-        "num_heads": 4,               # Number of attention heads
-        "num_encoder_layers": 4,      # Number of Transformer encoder layers
-        "dim_feedforward": 512,       # Size of the feedforward layer in each encoder block
-        "dropout": 0.1,               # Dropout rate for regularization
-        "max_seq_length": 500,        # Maximum sequence length for positional encoding
-        "num_classes": 2              # Number of output classes
+        "input_size": None,
+        "d_model": 128,
+        "num_heads": 4,
+        "num_encoder_layers": 4,
+        "dim_feedforward": 512,
+        "dropout": 0.1,
+        "max_seq_length": 500,
+        "num_classes": 2
     },
     "CNNLSTMModel": {
-        "input_size": 48,             # Number of features per timestep
-        "num_filters": 64,            # Number of filters in the CNN layer
-        "kernel_size": 3,             # Size of the convolutional kernel
-        "lstm_hidden_size": 128,      # Hidden size for the LSTM layers
-        "dropout": 0.2,               # Dropout rate for regularization
-        "num_classes": 2              # Number of output classes
+        "input_size": None,
+        "num_filters": 64,
+        "kernel_size": 3,
+        "lstm_hidden_size": 128,
+        "dropout": 0.2,
+        "num_classes": 2
     },
     "CNNModel": {
-        "input_size": 48,             # Number of features per timestep
-        "num_filters": 64,            # Number of filters in the CNN layer
-        "kernel_size": 3,             # Size of the convolutional kernel
-        "dropout": 0.2,               # Dropout rate for regularization
-        "num_classes": 2              # Number of output classes
+        "input_size": None,
+        "num_filters": 64,
+        "kernel_size": 3,
+        "dropout": 0.2,
+        "num_classes": 2
     },
     "DeepCNNModel": {
-        "input_size": 48,             # Number of features per timestep
-        "num_filters": 64,            # Initial number of filters, doubled with each convolutional layer
-        "kernel_size": 3,             # Size of the convolutional kernel
-        "dropout": 0.3,               # Dropout rate for regularization
-        "num_classes": 2              # Number of output classes
+        "input_size": None,
+        "num_filters": 64,
+        "kernel_size": 3,
+        "dropout": 0.3,
+        "num_classes": 2
     },
     "DeepCNNLSTMModel": {
-        "input_size": 48,             # Number of features per timestep
-        "num_filters": 64,            # Initial number of filters in the CNN layers
-        "kernel_size": 3,             # Size of the convolutional kernel
-        "lstm_hidden_size": 128,      # Hidden size for LSTM layers
-        "dropout": 0.3,               # Dropout rate for regularization
-        "num_classes": 2              # Number of output classes
+        "input_size": None,
+        "num_filters": 64,
+        "kernel_size": 3,
+        "lstm_hidden_size": 128,
+        "dropout": 0.3,
+        "num_classes": 2
     },
-
+    
     # Classical Machine Learning Models
     "XGBoost": {
-        "n_estimators": 100,          # Number of trees in the ensemble
-        "max_depth": 6,               # Maximum depth of each tree
-        "learning_rate": 0.1,         # Step size shrinkage to prevent overfitting
-        "subsample": 0.8,             # Subsample ratio of the training instances
-        "colsample_bytree": 0.8,      # Subsample ratio of columns when constructing each tree
-        "objective": "binary:logistic", # Binary classification objective
-        "use_label_encoder": False,    # Disable the use of label encoder for binary classification
-        "eval_metric": "logloss"      # Evaluation metric
+        "n_estimators": 100,
+        "max_depth": 6,
+        "learning_rate": 0.1,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "objective": "binary:logistic",
+        "use_label_encoder": False,
+        "eval_metric": "logloss"
     },
     "DecisionTree": {
-        "criterion": "gini",          # Criterion for splitting (options: 'gini', 'entropy')
-        "max_depth": None,            # Maximum depth of the tree; None means nodes expand until all leaves are pure
-        "min_samples_split": 2,       # Minimum number of samples required to split an internal node
-        "min_samples_leaf": 1,        # Minimum number of samples required to be at a leaf node
-        "random_state": 42            # Seed for reproducibility
+        "criterion": "gini",
+        "max_depth": None,
+        "min_samples_split": 2,
+        "min_samples_leaf": 1,
+        "random_state": 42
     },
     "RandomForest": {
-        "n_estimators": 200,          # Number of trees in the forest
-        "criterion": "gini",          # Criterion for splitting (options: 'gini', 'entropy')
-        "max_depth": None,            # Maximum depth of the tree; None means nodes expand until all leaves are pure
-        "min_samples_split": 2,       # Minimum number of samples required to split an internal node
-        "min_samples_leaf": 1,        # Minimum number of samples required to be at a leaf node
-        "bootstrap": True,            # Whether bootstrap samples are used when building trees
-        "random_state": 42            # Seed for reproducibility
+        "n_estimators": 200,
+        "criterion": "gini",
+        "max_depth": None,
+        "min_samples_split": 2,
+        "min_samples_leaf": 1,
+        "bootstrap": True,
+        "random_state": 42
     }
 }
+
+
 
 
 m_epochs = 1
