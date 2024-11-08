@@ -246,6 +246,8 @@ def pipeline_run(intervals, output_data_scaled, m_epochs, model_results, classif
             test_loss /= len(test_loader.dataset)
             test_accuracy = np.mean(np.array(test_pred) == np.array(test_true))
             logging.info(f"Model Name: {model_name} Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.4f}")
+            print(f"Model Name: {model_name} Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.4f}")
+            
 
             # Capture metrics for the current fold
             model_results = capture_metrics(test_true, test_pred, test_probs, f"{model_name} (Test)", model_results)
@@ -350,18 +352,18 @@ for index, features in enumerate(list_of_features):
             logging.warning(f"The intervals DataFrame for {id_} contains NaN values.")
 
         
-        print(features)
-        print(len(intervals.columns))
+        #print(features)
+        #print(len(intervals.columns))
         
         intervals = intervals[features]
 
         intervals = intervals.loc[:, ~intervals.columns.duplicated()]
 
-        print(len(intervals.columns))
+        #print(len(intervals.columns))
 
-        print(intervals.columns)
-        print(intervals.shape)
-        print(intervals.head())
+        #print(intervals.columns)
+        #print(intervals.shape)
+        #print(intervals.head())
         
         # Prepare output data for classification
         output_data = output_data[["Historic Glucose mg/dL"]]
@@ -416,7 +418,7 @@ for index, features in enumerate(list_of_features):
         # Manually format and log model results with mean and std deviation
         for model_name, metrics in model_results.items():
             logging.info(f"Model: {model_name}")
-            print(f"Model: {model_name}")
+            #print(f"Model: {model_name}")
             
             # Log each metric with comma-separated values and compute mean and std
             for metric_name in ['Accuracy', 'Precision', 'Recall', 'F1_Score']:
