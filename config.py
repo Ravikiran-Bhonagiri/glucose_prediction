@@ -195,20 +195,20 @@ intensity_features_2 = [
 ]
 
 intensity_features_3 = [
-     'Intensity_Lag_5min', 'Intensity_Lag_15min', 'Intensity_Lag_30min', 'Intensity_Lag_60min', 'Intensity_Lag_120min', 
+    'Intensity_Lag_5min', 'Intensity_Lag_15min', 'Intensity_Lag_30min', 'Intensity_Lag_60min', 'Intensity_Lag_120min', 
     'Intensity_Lag_180min', 'Intensity_Lag_240min', 'Intensity_Lag_360min', 'Intensity_Lag_720min', 'Intensity_Lag_1440min',
 ]
 
 intensity_features_4 = [
-   'Intensity_Lag_Diff_15min', 'Intensity_Lag_Diff_15min_Mean', 'Intensity_Lag_Diff_15min_Std',
-    'Intensity_Lag_Diff_30min', 'Intensity_Lag_Diff_30min_Mean', 'Intensity_Lag_Diff_30min_Std',
-    'Intensity_Lag_Diff_60min', 'Intensity_Lag_Diff_60min_Mean', 'Intensity_Lag_Diff_60min_Std',
-    'Intensity_Lag_Diff_90min', 'Intensity_Lag_Diff_90min_Mean', 'Intensity_Lag_Diff_90min_Std',
-    'Intensity_Lag_Diff_180min', 'Intensity_Lag_Diff_180min_Mean', 'Intensity_Lag_Diff_180min_Std',
-    'Intensity_Lag_Diff_240min', 'Intensity_Lag_Diff_240min_Mean', 'Intensity_Lag_Diff_240min_Std',
-    'Intensity_Lag_Diff_360min', 'Intensity_Lag_Diff_360min_Mean', 'Intensity_Lag_Diff_360min_Std',
-    'Intensity_Lag_Diff_720min', 'Intensity_Lag_Diff_720min_Mean', 'Intensity_Lag_Diff_720min_Std',
-    'Intensity_Lag_Diff_1440min', 'Intensity_Lag_Diff_1440min_Mean', 'Intensity_Lag_Diff_1440min_Std',
+     'Intensity_Lag_Diff_15min_Mean', 'Intensity_Lag_Diff_15min_Std',
+     'Intensity_Lag_Diff_30min_Mean', 'Intensity_Lag_Diff_30min_Std',
+     'Intensity_Lag_Diff_60min_Mean', 'Intensity_Lag_Diff_60min_Std',
+     'Intensity_Lag_Diff_90min_Mean', 'Intensity_Lag_Diff_90min_Std',
+     'Intensity_Lag_Diff_180min_Mean', 'Intensity_Lag_Diff_180min_Std',
+     'Intensity_Lag_Diff_240min_Mean', 'Intensity_Lag_Diff_240min_Std',
+     'Intensity_Lag_Diff_360min_Mean', 'Intensity_Lag_Diff_360min_Std',
+     'Intensity_Lag_Diff_720min_Mean', 'Intensity_Lag_Diff_720min_Std',
+     'Intensity_Lag_Diff_1440min_Mean', 'Intensity_Lag_Diff_1440min_Std',
 ]
 
 intensity_features_5 = [
