@@ -298,9 +298,6 @@ def set_input_size(config, input_size):
 
 list_of_features = [ features_1, features_2, features_3, features_4, features_5]
 
-interval_split = 48
-
-logging.info("Started experiment for 12 hrs interval")
 
 # List to store the models for evaluation
 model_names = ['LSTM', 'DeepLSTM', 'Transformer', 'CNN-LSTM', 'CNN', 'DeepCNN', 'DeepCNN-LSTM', 'XGBoost', 'DecisionTree', 'RandomForest']
@@ -325,6 +322,7 @@ def intialize_model_metrics(model_names_with_tags):
 
 results = {}
 
+logging.info("Running all experiments for all interval splits and couple of IDs")
 # Loop through each ID and perform the data processing and model evaluation
 for index, features in enumerate(list_of_features):
     logging.info(f"Processing features: {features} \n")
@@ -336,113 +334,115 @@ for index, features in enumerate(list_of_features):
 
     for interval_split in [12, 24, 48, 96]:
 
-      for id_ in ids:
-          logging.info(f"Processing ID: {id_}")
-          
-          # Load the combined data tuple from the .npy file for the current ID
-          features_data_path = f'/home/rxb2495/Glucose-Forecasting/final_data/{id_}_combined_data.npy'
-          labels_data_path = f'/home/rxb2495/Glucose-Forecasting/final_data/{id_}_main_data.npy'
-  
-          # Reconstruct DataFrames from the loaded data
-          intervals = load_dataframe_from_npy(features_data_path)
-          output_data = load_dataframe_from_npy(labels_data_path)
-  
-          # Handle missing values
-          if output_data.isnull().values.any():
-              logging.warning(f"The output_data DataFrame for {id_} contains NaN values.")
-          if intervals.isnull().values.any():
-              logging.warning(f"The intervals DataFrame for {id_} contains NaN values.")
-  
-          
-          intervals = intervals[features]
-  
-          intervals = intervals.loc[:, ~intervals.columns.duplicated()]
-          
-          # Prepare output data for classification
-          output_data = output_data[["Historic Glucose mg/dL"]]
-          
-          # Reduce memory usage by converting to appropriate data types
-          intervals = intervals.astype(np.float32)
-          output_data = output_data.astype(np.float32)
-  
-         # Step 1: Create categorical bins for binary classification
-          bins = [0, 100, float('inf')]  # Define bins: 0-100 is one class, >100 is the second class
-          labels = [0, 1]  # Class 0: 0-100, Class 1: >100
-  
-          # Step 2: Create a new column 'Glucose_Label' based on the specified bins
-          output_data['Glucose_Label'] = pd.cut(
-              output_data['Historic Glucose mg/dL'], 
-              bins=bins, 
-              labels=labels, 
-              right=True
-          ).astype(int)  # Convert to integer type (0 or 1)
-  
-          # Step 3: Check value counts of the new labels for logging
-          glucose_label_counts = output_data['Glucose_Label'].value_counts()
-          glucose_label_counts_dict = glucose_label_counts.to_dict()
-  
-          # Log the value counts as a dictionary
-          logging.info("Glucose_Label value counts (as dictionary):")
-          logging.info(f"{glucose_label_counts_dict}")
-  
-          # Step 4: Prepare the labels for model training
-          output_data_scaled = output_data["Glucose_Label"].values.astype(np.int64)
-  
-  
-          logging.info(f"Total size of data: {output_data_scaled.shape[0]}")
-  
-          # Split data into intervals
-          interval_size = 96
-          intervals = split_into_intervals(intervals, interval_size, interval_size)
-  
-          last_48 = intervals[:, -interval_split:, :]  # Last 24 entries
-  
-          intervals = last_48.astype(np.float32)
-  
-          feature_size = intervals.shape[2]
-          num_classes = 2
-  
-          model_results = pipeline_run(intervals, output_data_scaled, m_epochs, model_results, classification_config)
-  
-          # Logging the results at the end of each ID processing
-          logging.info("------------------------------------------------------------------")
-          logging.info(f"Processing completed for ID: {id_}")
-          
-          # Manually format and log model results with mean and std deviation
-          for model_name, metrics in model_results.items():
-              logging.info(f"Model: {model_name}")
-              #print(f"Model: {model_name}")
-              
-              # Log each metric with comma-separated values and compute mean and std
-              for metric_name in ['Accuracy', 'Precision', 'Recall', 'F1_Score']:
-                  metric_values = metrics[metric_name]
-                  
-                  # Skip calculations for 'AUC_ROC' if it contains invalid data
-                  if metric_name == 'AUC_ROC' and (not metric_values or any(val is None for val in metric_values)):
-                      logging.info(f"AUC_ROC: Not available due to null values")
-                      continue
-                  
-                  # Compute mean and std only for valid data
-                  mean_value = np.mean(metric_values) if metric_values else 0
-                  std_value = np.std(metric_values) if metric_values else 0
-                  
-                  # Log the metric values, mean, and std deviation
-                  logging.info(f"{metric_name}: {', '.join(map(str, metric_values))}")
-                  logging.info(f"{metric_name} (Mean): {mean_value:.4f}")
-                  logging.info(f"{metric_name} (Std): {std_value:.4f}")
-              
-              # Confusion Matrix and Classification Report can be tricky to format, but here's one way to handle them:
-              for i, conf_matrix in enumerate(metrics['Confusion_Matrix']):
-                  logging.info(f"Confusion Matrix {i+1}: {conf_matrix}")
-              for i, class_report in enumerate(metrics['Classification_Report']):
-                  logging.info(f"Classification Report {i+1}: {class_report}")
-          
-          logging.info("------------------------------------------------------------------")
-          
-          # Store results for the current ID
-          results[f"id_{id_}_{index}_{interval_split}"] = model_results
-  
-          logging.info("---------------------------completed------------------------------")
+        print(f"interval split {interval_split}")
+
+        for id_ in ids:
+            logging.info(f"Processing ID: {id_}")
+            
+            # Load the combined data tuple from the .npy file for the current ID
+            features_data_path = f'/home/rxb2495/Glucose-Forecasting/final_data/{id_}_combined_data.npy'
+            labels_data_path = f'/home/rxb2495/Glucose-Forecasting/final_data/{id_}_main_data.npy'
+
+            # Reconstruct DataFrames from the loaded data
+            intervals = load_dataframe_from_npy(features_data_path)
+            output_data = load_dataframe_from_npy(labels_data_path)
+
+            # Handle missing values
+            if output_data.isnull().values.any():
+                logging.warning(f"The output_data DataFrame for {id_} contains NaN values.")
+            if intervals.isnull().values.any():
+                logging.warning(f"The intervals DataFrame for {id_} contains NaN values.")
+
+            
+            intervals = intervals[features]
+
+            intervals = intervals.loc[:, ~intervals.columns.duplicated()]
+            
+            # Prepare output data for classification
+            output_data = output_data[["Historic Glucose mg/dL"]]
+            
+            # Reduce memory usage by converting to appropriate data types
+            intervals = intervals.astype(np.float32)
+            output_data = output_data.astype(np.float32)
+
+            # Step 1: Create categorical bins for binary classification
+            bins = [0, 100, float('inf')]  # Define bins: 0-100 is one class, >100 is the second class
+            labels = [0, 1]  # Class 0: 0-100, Class 1: >100
+
+            # Step 2: Create a new column 'Glucose_Label' based on the specified bins
+            output_data['Glucose_Label'] = pd.cut(
+                output_data['Historic Glucose mg/dL'], 
+                bins=bins, 
+                labels=labels, 
+                right=True
+            ).astype(int)  # Convert to integer type (0 or 1)
+
+            # Step 3: Check value counts of the new labels for logging
+            glucose_label_counts = output_data['Glucose_Label'].value_counts()
+            glucose_label_counts_dict = glucose_label_counts.to_dict()
+
+            # Log the value counts as a dictionary
+            logging.info("Glucose_Label value counts (as dictionary):")
+            logging.info(f"{glucose_label_counts_dict}")
+
+            # Step 4: Prepare the labels for model training
+            output_data_scaled = output_data["Glucose_Label"].values.astype(np.int64)
+
+
+            logging.info(f"Total size of data: {output_data_scaled.shape[0]}")
+
+            # Split data into intervals
+            interval_size = 96
+            intervals = split_into_intervals(intervals, interval_size, interval_size)
+
+            last_48 = intervals[:, -interval_split:, :]  # Last 24 entries
+
+            intervals = last_48.astype(np.float32)
+
+            feature_size = intervals.shape[2]
+            num_classes = 2
+
+            model_results = pipeline_run(intervals, output_data_scaled, m_epochs, model_results, classification_config)
+
+            # Logging the results at the end of each ID processing
+            logging.info("------------------------------------------------------------------")
+            logging.info(f"Processing completed for ID: {id_}")
+            
+            # Manually format and log model results with mean and std deviation
+            for model_name, metrics in model_results.items():
+                logging.info(f"Model: {model_name}")
+                #print(f"Model: {model_name}")
+                
+                # Log each metric with comma-separated values and compute mean and std
+                for metric_name in ['Accuracy', 'Precision', 'Recall', 'F1_Score']:
+                    metric_values = metrics[metric_name]
+                    
+                    # Skip calculations for 'AUC_ROC' if it contains invalid data
+                    if metric_name == 'AUC_ROC' and (not metric_values or any(val is None for val in metric_values)):
+                        logging.info(f"AUC_ROC: Not available due to null values")
+                        continue
+                    
+                    # Compute mean and std only for valid data
+                    mean_value = np.mean(metric_values) if metric_values else 0
+                    std_value = np.std(metric_values) if metric_values else 0
+                    
+                    # Log the metric values, mean, and std deviation
+                    logging.info(f"{metric_name}: {', '.join(map(str, metric_values))}")
+                    logging.info(f"{metric_name} (Mean): {mean_value:.4f}")
+                    logging.info(f"{metric_name} (Std): {std_value:.4f}")
+                
+                # Confusion Matrix and Classification Report can be tricky to format, but here's one way to handle them:
+                for i, conf_matrix in enumerate(metrics['Confusion_Matrix']):
+                    logging.info(f"Confusion Matrix {i+1}: {conf_matrix}")
+                for i, class_report in enumerate(metrics['Classification_Report']):
+                    logging.info(f"Classification Report {i+1}: {class_report}")
+            
+            logging.info("------------------------------------------------------------------")
+            
+            # Store results for the current ID
+            results[f"id_{id_}_{index}_{interval_split}"] = model_results
+
+            logging.info("---------------------------completed------------------------------")
 
 
 # Save results to CSV
