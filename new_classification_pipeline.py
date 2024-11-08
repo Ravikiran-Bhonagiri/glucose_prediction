@@ -269,9 +269,8 @@ def load_dataframe_from_npy(file_path):
     df = pd.DataFrame(data, columns=columns)
     return df
 
-def set_input_size(config, input_data):
+def set_input_size(config, input_size):
     """ Set the input size in the configuration based on input data shape """
-    input_size = input_data.shape[-1]  # Assuming input_data is of shape (batch, seq_len, num_features)
     for model in config:
         if 'input_size' in config[model]:
             config[model]['input_size'] = input_size
