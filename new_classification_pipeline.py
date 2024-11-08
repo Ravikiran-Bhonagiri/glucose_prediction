@@ -271,6 +271,10 @@ def pipeline_run(intervals, output_data_scaled, m_epochs, model_results, classif
             model.fit(X_train, y_train)
             y_val_pred = model.predict(X_val)
             y_val_probs = model.predict_proba(X_val)[:, 1] if hasattr(model, "predict_proba") else None
+
+            accuracy = accuracy_score(y_val, y_val_pred)
+            logging.info(f"{model_name} - Fold {fold + 1} Accuracy: {accuracy:.4f}")
+            print(f"{model_name} - Fold {fold + 1} Accuracy: {accuracy:.4f}")
             model_results = capture_metrics(y_val, y_val_pred, y_val_probs, f"{model_name} (Test)", model_results)
     
     return model_results
