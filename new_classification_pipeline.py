@@ -181,7 +181,11 @@ def pipeline_run(intervals, output_data_scaled, m_epochs, model_results, classif
 
                 # Training phase
                 for X_batch, y_batch in train_loader:
+                    
                     X_batch, y_batch = X_batch.to(device), y_batch.to(device)
+
+                    print(f"Batch {i+1}: X_batch shape: {X_batch.shape}, y_batch shape: {y_batch.shape}")
+                    
                     optimizer.zero_grad()
                     outputs = model(X_batch)
                     loss = criterion(outputs.squeeze(), y_batch)
@@ -312,6 +316,8 @@ for index, features in enumerate(list_of_features):
 
     classification_config = set_input_size(classification_config, len(features))
     model_results = intialize_model_metrics(model_names_with_tags)
+    
+    print(f"features length {len(features)}")
 
     for id_ in ids:
         logging.info(f"Processing ID: {id_}")
