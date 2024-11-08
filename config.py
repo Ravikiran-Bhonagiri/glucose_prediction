@@ -65,11 +65,6 @@ m_epochs = 100
 
 ids = ["MMCS0002", "MMCS0003", "MMCS0005", "MMCS0007"]
 
-# Define a dictionary to store results for each model and each ID
-#time_values = [12, 24, 48, 96]
-
-time_values = [48]
-
 #========================================================================================================================================================
 
 # Heart Rate Features
