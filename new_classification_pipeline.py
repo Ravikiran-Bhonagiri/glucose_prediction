@@ -136,7 +136,6 @@ def pipeline_run(intervals, output_data_scaled, m_epochs, model_results, classif
     # Define classical models with configurations
     classical_models = {
         'XGBoost': XGBClassifier(**classification_config['XGBoost']),
-        'DecisionTree': DecisionTreeClassifier(**classification_config['DecisionTree']),
         'RandomForest': RandomForestClassifier(**classification_config['RandomForest'])
     }
 
