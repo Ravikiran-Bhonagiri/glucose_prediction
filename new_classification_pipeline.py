@@ -180,7 +180,7 @@ def pipeline_run(intervals, output_data_scaled, m_epochs, model_results, classif
                 running_loss = 0.0
 
                 # Training phase
-                for X_batch, y_batch in train_loader:
+                for i, (X_batch, y_batch) in enumerate(train_loader):
                     
                     X_batch, y_batch = X_batch.to(device), y_batch.to(device)
 
