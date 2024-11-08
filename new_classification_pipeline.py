@@ -170,61 +170,43 @@ def pipeline_run(intervals, output_data_scaled, m_epochs, model_results, classif
             
             # Initialize model, loss function, and optimizer
             model = model_class(**model_params).to(device)
-            criterion = nn.BCEWithLogitsLoss()
+            criterion = nn.CrossEntropyLoss()
             optimizer = optim.Adam(model.parameters())
             logging.info(f"Model {model_name} initialized with optimizer and criterion")
 
-            # Training loop with validation after each epoch
             for epoch in range(m_epochs):
                 model.train()
                 running_loss = 0.0
-
+                
                 # Training phase
                 for i, (X_batch, y_batch) in enumerate(train_loader):
                     X_batch, y_batch = X_batch.to(device), y_batch.to(device)
                     
-                    # Ensure y_batch has the correct shape (batch_size, 1)
-                    y_batch = y_batch.view(-1, 1)
-
-                    # Forward pass
                     optimizer.zero_grad()
-                    outputs = model(X_batch)  # Output shape: (batch_size, 1)
-                    
-                    # Calculate the loss
+                    outputs = model(X_batch)
                     loss = criterion(outputs, y_batch)
                     loss.backward()
                     optimizer.step()
+                    
                     running_loss += loss.item() * X_batch.size(0)
-
-                    # Debugging information
-                    print(f"Batch {i+1}: X_batch shape: {X_batch.shape}, y_batch shape: {y_batch.shape}, outputs shape: {outputs.shape}")
-
-                # Calculate and log average training loss for the epoch
+                
                 train_loss = running_loss / len(train_loader.dataset)
                 logging.info(f"Epoch [{epoch + 1}/{m_epochs}] - Train Loss: {train_loss:.4f}")
-
-                # --------------------
-                # Validation Phase
-                # --------------------
+                
+                # Validation phase
                 model.eval()
-                val_loss, val_pred, val_true, val_probs = 0.0, [], [], []
+                val_loss, val_pred, val_true = 0.0, [], []
                 with torch.no_grad():
                     for X_batch, y_batch in val_loader:
                         X_batch, y_batch = X_batch.to(device), y_batch.to(device)
-                        y_batch = y_batch.view(-1, 1)  # Ensure y_batch has shape (batch_size, 1)
-
                         outputs = model(X_batch)
                         loss = criterion(outputs, y_batch)
                         val_loss += loss.item() * X_batch.size(0)
                         
-                        # Apply sigmoid to get probabilities
-                        probs = torch.sigmoid(outputs).cpu().numpy()
-                        preds = (probs > 0.5).astype(int)  # Convert probabilities to binary predictions
+                        preds = torch.argmax(outputs, dim=1).cpu().numpy()
                         val_pred.extend(preds)
                         val_true.extend(y_batch.cpu().numpy())
-                        val_probs.extend(probs)
-
-                # Calculate validation metrics
+                
                 val_loss /= len(val_loader.dataset)
                 val_accuracy = np.mean(np.array(val_pred) == np.array(val_true))
                 logging.info(f"Epoch [{epoch + 1}/{m_epochs}] - Val Loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.4f}")
@@ -235,29 +217,35 @@ def pipeline_run(intervals, output_data_scaled, m_epochs, model_results, classif
             model.eval()
             test_pred, test_true, test_probs = [], [], []
             test_loss = 0.0
+
             with torch.no_grad():
                 for X_batch, y_batch in test_loader:
                     X_batch, y_batch = X_batch.to(device), y_batch.to(device)
-                    y_batch = y_batch.view(-1, 1)  # Ensure y_batch has shape (batch_size, 1)
-
-                    outputs = model(X_batch)
+                    
+                    # Forward pass
+                    outputs = model(X_batch)  # Output shape: (batch_size, num_classes)
                     loss = criterion(outputs, y_batch)
                     test_loss += loss.item() * X_batch.size(0)
                     
-                    # Apply sigmoid to get probabilities
-                    probs = torch.sigmoid(outputs).cpu().numpy()
-                    preds = (probs > 0.5).astype(int)
+                    # Convert logits to probabilities using softmax
+                    probs = torch.softmax(outputs, dim=1).cpu().numpy()  # Shape: (batch_size, 2)
+                    
+                    # Get predicted classes (0 or 1)
+                    preds = np.argmax(probs, axis=1)
+                    
+                    # Store predictions, true labels, and probabilities
                     test_pred.extend(preds)
                     test_true.extend(y_batch.cpu().numpy())
-                    test_probs.extend(probs)
+                    test_probs.extend(probs[:, 1])  # Probability of the positive class (class 1)
 
-            # Calculate and log test metrics
+            # Calculate average test loss and accuracy
             test_loss /= len(test_loader.dataset)
             test_accuracy = np.mean(np.array(test_pred) == np.array(test_true))
-            logging.info(f"{model_name} - Fold {fold + 1} Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.4f}")
+            logging.info(f"Model Name: {model_name} Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.4f}")
 
             # Capture metrics for the current fold
             model_results = capture_metrics(test_true, test_pred, test_probs, f"{model_name} (Test)", model_results)
+
 
     # -------------------
     # Classical Models
@@ -401,9 +389,6 @@ for index, features in enumerate(list_of_features):
         # Step 4: Prepare the labels for model training
         output_data_scaled = output_data[["Glucose_Label"]].values.astype(np.float32)
 
-        # Step 5: Reshape the labels to ensure compatibility with BCEWithLogitsLoss
-        # The shape should be (batch_size, 1)
-        output_data_scaled = output_data_scaled.reshape(-1, 1)
 
         logging.info(f"Total size of data: {output_data_scaled.shape[0]}")
 
