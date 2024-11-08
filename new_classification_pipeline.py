@@ -387,7 +387,7 @@ for index, features in enumerate(list_of_features):
         logging.info(f"{glucose_label_counts_dict}")
 
         # Step 4: Prepare the labels for model training
-        output_data_scaled = output_data[["Glucose_Label"]].values.astype(np.float32)
+        output_data_scaled = output_data["Glucose_Label"].values.astype(np.float32)
 
 
         logging.info(f"Total size of data: {output_data_scaled.shape[0]}")
