@@ -8,12 +8,6 @@ classification_config = {
         "dropout": 0.2,
         "num_classes": 2
     },
-    "DeepLSTMModel": {
-        "input_size": None,       
-        "hidden_size": 256,
-        "dropout": 0.3,
-        "num_classes": 2
-    },
     "TransformerModel": {
         "input_size": None,
         "d_model": 128,
@@ -39,21 +33,6 @@ classification_config = {
         "dropout": 0.2,
         "num_classes": 2
     },
-    "DeepCNNModel": {
-        "input_size": None,
-        "num_filters": 64,
-        "kernel_size": 3,
-        "dropout": 0.3,
-        "num_classes": 2
-    },
-    "DeepCNNLSTMModel": {
-        "input_size": None,
-        "num_filters": 64,
-        "kernel_size": 3,
-        "lstm_hidden_size": 128,
-        "dropout": 0.3,
-        "num_classes": 2
-    },
     
     # Classical Machine Learning Models
     "XGBoost": {
@@ -64,13 +43,6 @@ classification_config = {
         "colsample_bytree": 0.8,
         "objective": "binary:logistic",
         "eval_metric": "logloss"
-    },
-    "DecisionTree": {
-        "criterion": "gini",
-        "max_depth": None,
-        "min_samples_split": 2,
-        "min_samples_leaf": 1,
-        "random_state": 42
     },
     "RandomForest": {
         "n_estimators": 200,
