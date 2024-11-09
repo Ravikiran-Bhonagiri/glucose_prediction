@@ -335,6 +335,8 @@ for index, features in enumerate(list_of_features):
             
             last_48 = intervals[:, -interval_split:, :]  # Last interval_split entries
 
+            intervals = intervals.loc[:, ~intervals.columns.duplicated()]
+
             intervals = last_48.astype(np.float32)
 
             # Run the pipeline for forecasting
