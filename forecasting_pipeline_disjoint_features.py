@@ -11,6 +11,9 @@ import pandas as pd
 import warnings
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, median_absolute_error, explained_variance_score
 import numpy as np
+from xgboost import XGBRegressor
+from sklearn.ensemble import RandomForestRegressor
+
 
 from regressor_models import LSTMModel, TransformerModel, CNNLSTMModel, CNNModel
 from config import regression_config, \
@@ -325,8 +328,8 @@ for index, features in enumerate(list_of_features):
             features_data_path = f'/home/rxb2495/Glucose-Forecasting/final_data/{id_}_combined_data.npy'
             labels_data_path = f'/home/rxb2495/Glucose-Forecasting/final_data/{id_}_main_data.npy'
             
-            intervals = load_dataframe_from_npy(features_data_path)[features]
-            output_data = load_dataframe_from_npy(labels_data_path)["Historic Glucose mg/dL"]
+            intervals = load_dataframe_from_npy(features_data_path)
+            output_data = load_dataframe_from_npy(labels_data_path)
 
             # Handle missing values
             if output_data.isnull().values.any():
@@ -334,7 +337,10 @@ for index, features in enumerate(list_of_features):
             if intervals.isnull().values.any():
                 logging.warning(f"The intervals DataFrame for {id_} contains NaN values.")
 
-            
+            output_data = output_data["Historic Glucose mg/dL"].values.astype(np.float32)
+
+            print(output_data.columns)
+
             intervals = intervals[features]
 
             intervals = intervals.loc[:, ~intervals.columns.duplicated()]
