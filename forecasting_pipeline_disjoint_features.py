@@ -22,7 +22,6 @@ from config import regression_config, \
                     intensity_features_1, intensity_features_2, intensity_features_3, intensity_features_4, intensity_features_5, \
                     steps_features_1, steps_features_2, steps_features_3, steps_features_4, steps_features_5,  temporal_features, m_epochs, ids
 
-m_epochs = 1
 # Ignore warnings
 warnings.filterwarnings("ignore")
 
