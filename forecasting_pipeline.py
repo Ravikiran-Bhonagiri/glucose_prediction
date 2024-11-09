@@ -236,6 +236,10 @@ def pipeline_run(intervals, output_data, m_epochs, model_results, regression_con
     # ----------------------------
     # Classical Regression Models
     # ----------------------------
+
+    X_full_flattened = intervals.reshape(intervals.shape[0], -1)
+    y_full = output_data_scaled.flatten()
+  
     classical_models = {
         'XGBoost': XGBRegressor(**regression_config['XGBoost']),
         'RandomForest': RandomForestRegressor(**regression_config['RandomForest'])
