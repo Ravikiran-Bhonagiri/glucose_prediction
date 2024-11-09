@@ -384,6 +384,6 @@ for model_name, metrics in model_results.items():
 
 df = pd.DataFrame(csv_data)
 current_time = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-df.to_csv(f"/home/rxb2495/forecasting_results_baseline_{m_epochs}_epochs_{current_time}.csv", index=False)
+df.to_csv(f"/home/rxb2495/forecasting_results_baseline_disjoint_features_{m_epochs}_epochs_{current_time}.csv", index=False)
 
 logging.info("Forecasting pipeline completed successfully!")
