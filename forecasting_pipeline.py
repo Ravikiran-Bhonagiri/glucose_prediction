@@ -11,6 +11,9 @@ import pandas as pd
 import warnings
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, median_absolute_error, explained_variance_score
 import numpy as np
+from xgboost import XGBRegressor
+from sklearn.ensemble import RandomForestRegressor
+
 
 from regressor_models import LSTMModel, TransformerModel, CNNLSTMModel, CNNModel
 from config import regression_config, \
