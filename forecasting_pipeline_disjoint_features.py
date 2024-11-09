@@ -343,8 +343,6 @@ for index, features in enumerate(list_of_features):
 
             output_data = output_data["Historic Glucose mg/dL"].values.astype(np.float32)
 
-            print(output_data.columns)
-
             intervals = intervals[features]
 
             intervals = intervals.loc[:, ~intervals.columns.duplicated()]
