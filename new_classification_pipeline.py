@@ -300,7 +300,7 @@ list_of_features = [ features_1, features_2, features_3, features_4, features_5]
 
 
 # List to store the models for evaluation
-model_names = ['LSTM', 'DeepLSTM', 'Transformer', 'CNN-LSTM', 'CNN', 'DeepCNN', 'DeepCNN-LSTM', 'XGBoost', 'DecisionTree', 'RandomForest']
+model_names = ['LSTM', 'Transformer', 'CNN-LSTM', 'CNN', 'XGBoost', 'RandomForest']
 
 # Modified model names with Validation and Test tags
 model_names_with_tags = [f"{name} (Test)" for name in model_names]
