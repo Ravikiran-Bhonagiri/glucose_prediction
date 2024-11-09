@@ -8,15 +8,12 @@ Transformer layers.
 
 Models included:
     1. LSTMModel: A basic LSTM-based model with stacked LSTM layers.
-    2. DeepLSTMModel: A deeper LSTM model with multiple layers and configurable dropout.
-    3. TransformerModel: A Transformer-based model for time series regression.
-    4. CNNLSTMModel: A hybrid model combining CNN and LSTM layers.
-    5. CNNModel: A simple CNN model for spatial feature extraction in regression tasks.
-    6. DeepCNNModel: A deeper CNN model with multiple convolutional layers.
-    7. DeepCNNLSTMModel: A hybrid model combining multiple CNN and LSTM layers for deep spatial and temporal feature extraction in regression.
+    2. TransformerModel: A Transformer-based model for time series regression.
+    3. CNNLSTMModel: A hybrid model combining CNN and LSTM layers.
+    4. CNNModel: A simple CNN model for spatial feature extraction in regression tasks.
 
 Author: Ravikiran Bhonagiri
-Date: 5th November, 2024
+Date: 9th November, 2024
 """
 
 import torch
