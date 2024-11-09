@@ -38,9 +38,9 @@ class LSTMModel(nn.Module):
     - 2 LSTM layers with dropout for regularization.
     - Fully connected layers with ReLU activation to map LSTM output to a regression output.
     """
-    def __init__(self, input_size, hidden_size):
+    def __init__(self, input_size, hidden_size, dropout):
         super(LSTMModel, self).__init__()
-        self.lstm = nn.LSTM(input_size, hidden_size, num_layers=2, batch_first=True, dropout=0.2)
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers=2, batch_first=True, dropout)
         self.fc1 = nn.Linear(hidden_size, 64)
         self.fc2 = nn.Linear(64, 1)  # Single output for regression
     
@@ -63,9 +63,9 @@ class PositionalEncoding(nn.Module):
     - max_seq_length (int): Maximum length of the input sequence.
     - dropout_rate (float): Dropout rate for regularization of positional encoding.
     """
-    def __init__(self, d_model, max_seq_length=5000, dropout_rate=0.1):
+    def __init__(self, d_model, max_seq_length=5000, dropout=0.1):
         super(PositionalEncoding, self).__init__()
-        self.dropout = nn.Dropout(p=dropout_rate)
+        self.dropout = nn.Dropout(p=dropout)
         
         position = torch.arange(0, max_seq_length).unsqueeze(1).float()
         div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
@@ -102,14 +102,14 @@ class TransformerModel(nn.Module):
     - Fully connected layer to output a single regression value.
     """
     def __init__(self, input_size, num_heads=4, num_encoder_layers=4, 
-                 d_model=128, dim_feedforward=512, dropout_rate=0.1, max_seq_length=500):
+                 d_model=128, dim_feedforward=512, dropout=0.1, max_seq_length=500):
         super(TransformerModel, self).__init__()
         self.input_projection = nn.Linear(input_size, d_model)
-        self.positional_encoding = PositionalEncoding(d_model, max_seq_length, dropout_rate)
+        self.positional_encoding = PositionalEncoding(d_model, max_seq_length, dropout)
         
         encoder_layer = nn.TransformerEncoderLayer(
             d_model=d_model, nhead=num_heads, dim_feedforward=dim_feedforward, 
-            dropout=dropout_rate, batch_first=True
+            dropout=dropout, batch_first=True
         )
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_encoder_layers)
         self.fc = nn.Linear(d_model, 1)  # Single output for regression
@@ -143,14 +143,14 @@ class CNNLSTMModel(nn.Module):
     - Fully connected layer for regression.
     """
     def __init__(self, input_size, num_filters=64, kernel_size=3,
-                 lstm_hidden_size=128, num_lstm_layers=2, dropout_rate=0.2):
+                 lstm_hidden_size=128, num_lstm_layers=2, dropout=0.2):
         super(CNNLSTMModel, self).__init__()
         self.conv1 = nn.Conv1d(in_channels=input_size, out_channels=num_filters,
                                kernel_size=kernel_size, padding=1)
         self.pool = nn.MaxPool1d(kernel_size=2, stride=2)
-        self.dropout_cnn = nn.Dropout(dropout_rate)
+        self.dropout_cnn = nn.Dropout(dropout)
         self.lstm = nn.LSTM(input_size=num_filters, hidden_size=lstm_hidden_size,
-                            num_layers=num_lstm_layers, batch_first=True, dropout=dropout_rate)
+                            num_layers=num_lstm_layers, batch_first=True, dropout=dropout)
         self.fc = nn.Linear(lstm_hidden_size, 1)  # Single output for regression
     
     def forward(self, x):
@@ -182,11 +182,11 @@ class CNNModel(nn.Module):
     - Global average pooling and dropout.
     - Fully connected layer for final regression output.
     """
-    def __init__(self, input_size, num_filters=64, kernel_size=3, dropout_rate=0.2):
+    def __init__(self, input_size, num_filters=64, kernel_size=3, dropout=0.2):
         super(CNNModel, self).__init__()
         self.conv1 = nn.Conv1d(in_channels=input_size, out_channels=num_filters, kernel_size=kernel_size, padding=1)
         self.pool = nn.MaxPool1d(2, 2)
-        self.dropout = nn.Dropout(dropout_rate)
+        self.dropout = nn.Dropout(dropout)
         self.fc = nn.Linear(num_filters, 1)  # Single output for regression
     
     def forward(self, x):
