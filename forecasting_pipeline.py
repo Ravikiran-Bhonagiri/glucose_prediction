@@ -328,6 +328,17 @@ for index, features in enumerate(list_of_features):
             
             intervals = load_dataframe_from_npy(features_data_path)[features]
             output_data = load_dataframe_from_npy(labels_data_path)["Historic Glucose mg/dL"].values.astype(np.float32)
+
+            # Handle missing values
+            if output_data.isnull().values.any():
+                logging.warning(f"The output_data DataFrame for {id_} contains NaN values.")
+            if intervals.isnull().values.any():
+                logging.warning(f"The intervals DataFrame for {id_} contains NaN values.")
+
+            
+            intervals = intervals[features]
+
+            intervals = intervals.loc[:, ~intervals.columns.duplicated()]
             
             # Convert intervals to numpy array
             intervals = intervals.astype(np.float32).values
@@ -337,8 +348,6 @@ for index, features in enumerate(list_of_features):
             last_48 = intervals[:, -interval_split:, :]  # Last interval_split entries
 
             intervals = last_48.astype(np.float32)
-
-            intervals = intervals.loc[:, ~intervals.columns.duplicated()]
 
             # Run the pipeline for forecasting
             model_results = pipeline_run(intervals, output_data, m_epochs, model_results, regression_config)
