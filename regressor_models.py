@@ -61,7 +61,7 @@ class PositionalEncoding(nn.Module):
     Parameters:
     - d_model (int): Dimensionality of the model embeddings.
     - max_seq_length (int): Maximum length of the input sequence.
-    - dropout_rate (float): Dropout rate for regularization of positional encoding.
+    - dropout (float): Dropout rate for regularization of positional encoding.
     """
     def __init__(self, d_model, max_seq_length=5000, dropout=0.1):
         super(PositionalEncoding, self).__init__()
@@ -93,7 +93,7 @@ class TransformerModel(nn.Module):
     - num_encoder_layers (int): Number of Transformer encoder layers.
     - d_model (int): Dimensionality of the model's embeddings.
     - dim_feedforward (int): Size of the feedforward layer in each encoder block.
-    - dropout_rate (float): Dropout rate for regularization.
+    - dropout (float): Dropout rate for regularization.
     - max_seq_length (int): Maximum length of input sequences.
 
     Architecture:
@@ -135,7 +135,7 @@ class CNNLSTMModel(nn.Module):
     - kernel_size (int): Size of the convolutional kernel.
     - lstm_hidden_size (int): Number of hidden units in the LSTM layer.
     - num_lstm_layers (int): Number of stacked LSTM layers.
-    - dropout_rate (float): Dropout rate for regularization.
+    - dropout (float): Dropout rate for regularization.
 
     Architecture:
     - CNN layer with ReLU and pooling for spatial feature extraction.
@@ -175,7 +175,7 @@ class CNNModel(nn.Module):
     - input_size (int): Dimension of input features per timestep.
     - num_filters (int): Number of filters in the CNN layer.
     - kernel_size (int): Size of the convolutional kernel.
-    - dropout_rate (float): Dropout rate for regularization.
+    - dropout (float): Dropout rate for regularization.
 
     Architecture:
     - Single CNN layer for basic spatial feature extraction.
