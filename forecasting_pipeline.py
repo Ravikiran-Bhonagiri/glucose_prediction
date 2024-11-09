@@ -13,13 +13,13 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, m
 import numpy as np
 
 from regressor_models import LSTMModel, TransformerModel, CNNLSTMModel, CNNModel
-from config import classification_config, \
+from config import regression_config, \
                     heart_rate_features_1, heart_rate_features_2, heart_rate_features_3, heart_rate_features_4, heart_rate_features_5, \
                     sleep_features_1, sleep_features_2, sleep_features_3, sleep_features_4, sleep_features_5,  \
                     intensity_features_1, intensity_features_2, intensity_features_3, intensity_features_4, intensity_features_5, \
                     steps_features_1, steps_features_2, steps_features_3, steps_features_4, steps_features_5,  temporal_features, m_epochs, ids
 
-
+m_epochs = 1
 # Ignore warnings
 warnings.filterwarnings("ignore")
 
@@ -41,6 +41,12 @@ features_4 =  features_3 + heart_rate_features_4 + sleep_features_4 + intensity_
 
 features_5 =  features_4 + heart_rate_features_5 + sleep_features_5 + intensity_features_5 + steps_features_5
 
+# List to store the models for evaluation
+model_names = ['LSTM', 'Transformer', 'CNN-LSTM', 'CNN', 'XGBoost', 'RandomForest']
+
+# Modified model names with Validation and Test tags
+model_names_with_tags = [f"{name} (Test)" for name in model_names]
+
 
 # Function to split data into intervals
 def split_into_intervals(data, interval_size, stride):
@@ -53,7 +59,6 @@ def split_into_intervals(data, interval_size, stride):
         interval = data[start_ix:end_ix]
         intervals.append(interval)
     return np.array(intervals)
-
 
 
 # Function to capture and log metrics for regression
@@ -98,19 +103,20 @@ def capture_metrics(y_test, y_pred, model_name, model_results):
 
 
 # Pipeline function for training models
-def pipeline_run(intervals, output_data, m_epochs, model_results, classification_config):
+def pipeline_run(intervals, output_data, m_epochs, model_results, regression_config):
     """
     Main pipeline function for training deep learning models using K-Fold cross-validation.
+    This includes training, validation after every epoch, and a final test evaluation after all epochs.
     """
     kf = KFold(n_splits=5, shuffle=True, random_state=42)
     logging.info("Initialized K-Fold cross-validation")
 
     # Define deep learning models with configurations
     deep_models = {
-        'LSTM': (LSTMModel, classification_config['LSTMModel']),
-        'Transformer': (TransformerModel, classification_config['TransformerModel']),
-        'CNN-LSTM': (CNNLSTMModel, classification_config['CNNLSTMModel']),
-        'CNN': (CNNModel, classification_config['CNNModel'])
+        'LSTM': (LSTMModel, regression_config['LSTMModel']),
+        'Transformer': (TransformerModel, regression_config['TransformerModel']),
+        'CNN-LSTM': (CNNLSTMModel, regression_config['CNNLSTMModel']),
+        'CNN': (CNNModel, regression_config['CNNModel'])
     }
 
     # Loop through each model
@@ -142,10 +148,12 @@ def pipeline_run(intervals, output_data, m_epochs, model_results, classification
             criterion = nn.MSELoss()
             optimizer = optim.Adam(model.parameters())
 
-            # Training loop
+            # Training loop with validation after each epoch
             for epoch in range(m_epochs):
                 model.train()
                 running_loss = 0.0
+                
+                # Training Phase
                 for X_batch, y_batch in train_loader:
                     X_batch, y_batch = X_batch.to(device), y_batch.to(device)
                     optimizer.zero_grad()
@@ -158,20 +166,71 @@ def pipeline_run(intervals, output_data, m_epochs, model_results, classification
                 train_loss = running_loss / len(train_loader.dataset)
                 logging.info(f"Epoch [{epoch + 1}/{m_epochs}] - Train Loss: {train_loss:.4f}")
 
-            # Test evaluation
+                # Validation Phase after each epoch
+                model.eval()
+                val_pred, val_true = [], []
+                val_loss = 0.0
+                with torch.no_grad():
+                    for X_batch, y_batch in val_loader:
+                        X_batch, y_batch = X_batch.to(device), y_batch.to(device)
+                        outputs = model(X_batch).squeeze()
+                        loss = criterion(outputs, y_batch)
+                        val_loss += loss.item() * X_batch.size(0)
+                        
+                        val_pred.extend(outputs.cpu().numpy())
+                        val_true.extend(y_batch.cpu().numpy())
+            
+
+                # Calculate validation metrics
+                val_loss /= len(val_loader.dataset)
+                val_mae = mean_absolute_error(val_true, val_pred)
+                val_mse = mean_squared_error(val_true, val_pred)
+                val_rmse = np.sqrt(val_mse)
+
+                # Calculate MAPE (handling division by zero)
+                val_mape = np.mean(np.abs((np.array(val_true) - np.array(val_pred)) / np.array(val_true))) * 100 if np.all(val_true) else float('inf')
+
+                logging.info(
+                    f"Epoch [{epoch + 1}/{m_epochs}] - Val Loss: {val_loss:.4f}, Val MAE: {val_mae:.4f}, Val MSE: {val_mse:.4f}, Val RMSE: {val_rmse:.4f}, Val MAPE: {val_mape:.4f}"
+                )
+
+            # Test Evaluation After All Epochs
             model.eval()
             test_pred, test_true = [], []
+            test_loss = 0.0
             with torch.no_grad():
                 for X_batch, y_batch in test_loader:
                     X_batch, y_batch = X_batch.to(device), y_batch.to(device)
                     outputs = model(X_batch).squeeze()
+                    loss = criterion(outputs, y_batch)
+                    test_loss += loss.item() * X_batch.size(0)
+                    
                     test_pred.extend(outputs.cpu().numpy())
                     test_true.extend(y_batch.cpu().numpy())
 
-            # Capture metrics
-            model_results = capture_metrics(np.array(test_true), np.array(test_pred), model_name, model_results)
+            # Calculate test loss and various regression metrics
+            test_loss /= len(test_loader.dataset)
+            test_mae = mean_absolute_error(test_true, test_pred)
+            test_mse = mean_squared_error(test_true, test_pred)
+            test_rmse = np.sqrt(test_mse)
+
+            # Calculate MAPE (handling division by zero)
+            test_mape = np.mean(np.abs((np.array(test_true) - np.array(test_pred)) / np.array(test_true))) * 100 \
+                if np.all(test_true) else float('inf')
+
+            # Log the test metrics
+            logging.info(f"Test Loss: {test_loss:.4f}, MAE: {test_mae:.4f}, MSE: {test_mse:.4f}, RMSE: {test_rmse:.4f}, MAPE: {test_mape:.4f}")
+
+            print(f"Test Loss: {test_loss:.4f}, MAE: {test_mae:.4f}, MSE: {test_mse:.4f}, RMSE: {test_rmse:.4f}, MAPE: {test_mape:.4f}")
+
+
+            # Capture metrics for the current fold
+            model_results = capture_metrics(
+                np.array(test_true), np.array(test_pred), f"{model_name} (Test)", model_results
+            )
 
     return model_results
+
 
 # Function to load data from .npy files
 def load_dataframe_from_npy(file_path):
@@ -180,32 +239,73 @@ def load_dataframe_from_npy(file_path):
     data = data_dict['data']
     return pd.DataFrame(data, columns=columns)
 
-# Initialize model metrics dictionary
-def initialize_model_metrics(model_names):
-    return {model_name: {'MAE': [], 'MSE': [], 'MAPE': []} for model_name in model_names}
 
+def set_input_size(config, input_size):
+    """ Set the input size in the configuration based on input data shape """
+    for model in config:
+        if 'input_size' in config[model]:
+            config[model]['input_size'] = input_size
+    return config
+
+
+def initialize_model_metrics(model_names_with_tags):
+    model_results = {model_name: {
+        'MAE': [],          # Mean Absolute Error
+        'MSE': [],          # Mean Squared Error
+        'RMSE': [],         # Root Mean Squared Error
+        'MAPE': [],         # Mean Absolute Percentage Error
+        'R2_Score': [],     # Coefficient of Determination (R²)
+        'Median_AE': [],    # Median Absolute Error
+        'Explained_Variance': []  # Explained Variance Score
+    } for model_name in model_names_with_tags}
+    
+    return model_results
 # Main pipeline execution
 logging.info("Running forecasting pipeline")
-model_names = ['LSTM', 'Transformer', 'CNN-LSTM', 'CNN']
-model_results = initialize_model_metrics(model_names)
 
-for id_ in ids:
-    logging.info(f"Processing ID: {id_}")
 
-    # Load features and labels
-    features_data_path = f'/home/rxb2495/Glucose-Forecasting/final_data/{id_}_combined_data.npy'
-    labels_data_path = f'/home/rxb2495/Glucose-Forecasting/final_data/{id_}_main_data.npy'
+list_of_features = [ features_1, features_2, features_3, features_4, features_5]
+
+results = {}
+
+logging.info("Running all experiments for all interval splits and couple of IDs")
+# Loop through each ID and perform the data processing and model evaluation
+for index, features in enumerate(list_of_features):
+    logging.info(f"Processing features: {features} \n")
+
+    regression_config = set_input_size(regression_config, len(features))
+    model_results = initialize_model_metrics(model_names_with_tags)
     
-    intervals = load_dataframe_from_npy(features_data_path)[features]
-    output_data = load_dataframe_from_npy(labels_data_path)["Historic Glucose mg/dL"].values.astype(np.float32)
-    
-    # Convert intervals to numpy array
-    intervals = intervals.astype(np.float32).values
-    interval_size = 96
-    intervals = split_into_intervals(intervals, interval_size, interval_size)
-    
-    # Run the pipeline for forecasting
-    model_results = pipeline_run(intervals, output_data, m_epochs, model_results, classification_config)
+    print(f"features length {len(features)}")
+
+    for interval_split in [12, 24, 48, 96]:
+
+        print(f"interval split {interval_split}")
+        # Load data for the current features and interval split
+
+        for id_ in ids:
+            logging.info(f"Processing ID: {id_}")
+
+            # Load features and labels
+            features_data_path = f'/home/rxb2495/Glucose-Forecasting/final_data/{id_}_combined_data.npy'
+            labels_data_path = f'/home/rxb2495/Glucose-Forecasting/final_data/{id_}_main_data.npy'
+            
+            intervals = load_dataframe_from_npy(features_data_path)[features]
+            output_data = load_dataframe_from_npy(labels_data_path)["Historic Glucose mg/dL"].values.astype(np.float32)
+            
+            # Convert intervals to numpy array
+            intervals = intervals.astype(np.float32).values
+            interval_size = 96
+            intervals = split_into_intervals(intervals, interval_size, interval_size)
+            
+            last_48 = intervals[:, -interval_split:, :]  # Last interval_split entries
+
+            intervals = last_48.astype(np.float32)
+
+            # Run the pipeline for forecasting
+            model_results = pipeline_run(intervals, output_data, m_epochs, model_results, regression_config)
+
+            results[f"id_{id_}_{index}_{interval_split}"] = model_results
 
 # Save results to CSV
 csv_data = []
@@ -214,14 +314,23 @@ for model_name, metrics in model_results.items():
         "Model": model_name,
         "Mean MAE": np.mean(metrics['MAE']),
         "Mean MSE": np.mean(metrics['MSE']),
+        "Mean RMSE": np.mean(metrics['RMSE']),
         "Mean MAPE": np.mean(metrics['MAPE']),
+        "Mean R2 Score": np.mean(metrics['R2_Score']),
+        "Mean Median AE": np.mean(metrics['Median_AE']),
+        "Mean Explained Variance": np.mean(metrics['Explained_Variance']),
         "MAE List": metrics['MAE'],
         "MSE List": metrics['MSE'],
-        "MAPE List": metrics['MAPE']
+        "RMSE List": metrics['RMSE'],
+        "MAPE List": metrics['MAPE'],
+        "R2_Score List": metrics['R2_Score'],
+        "Median_AE List": metrics['Median_AE'],
+        "Explained_Variance List": metrics['Explained_Variance']
     })
+
 
 df = pd.DataFrame(csv_data)
 current_time = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-df.to_csv(f"/home/rxb2495/forecasting_results_{m_epochs}_epochs_{current_time}.csv", index=False)
+df.to_csv(f"/home/rxb2495/forecasting_results_baseline_{m_epochs}_epochs_{current_time}.csv", index=False)
 
 logging.info("Forecasting pipeline completed successfully!")
