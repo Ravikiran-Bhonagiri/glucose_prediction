@@ -251,8 +251,8 @@ def pipeline_run(intervals, output_data, m_epochs, model_results, regression_con
         for fold, (train_index, test_index) in enumerate(kf.split(intervals)):
             logging.info(f"Processing Fold {fold + 1} for model: {model_name}")
 
-            X_train, X_test = intervals[train_index], intervals[test_index]
-            y_train, y_test = output_data[train_index], output_data[test_index]
+            X_train, X_test = X_full_flattened[train_index], X_full_flattened[test_index]
+            y_train, y_test = y_full[train_index], y_full[test_index]
 
             # Train classical model
             model.fit(X_train, y_train)
