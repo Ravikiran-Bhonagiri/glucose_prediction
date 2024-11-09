@@ -326,8 +326,10 @@ for index, features in enumerate(list_of_features):
             features_data_path = f'/home/rxb2495/Glucose-Forecasting/final_data/{id_}_combined_data.npy'
             labels_data_path = f'/home/rxb2495/Glucose-Forecasting/final_data/{id_}_main_data.npy'
             
-            intervals = load_dataframe_from_npy(features_data_path)[features]
-            output_data = load_dataframe_from_npy(labels_data_path)["Historic Glucose mg/dL"]
+            intervals = load_dataframe_from_npy(features_data_path)
+            output_data = load_dataframe_from_npy(labels_data_path)
+
+            print(output_data.columns)
 
             # Handle missing values
             if output_data.isnull().values.any():
@@ -339,6 +341,8 @@ for index, features in enumerate(list_of_features):
             intervals = intervals[features]
 
             intervals = intervals.loc[:, ~intervals.columns.duplicated()]
+
+            output_data = output_data["Historic Glucose mg/dL"].values.astype(np.float32)
             
             # Convert intervals to numpy array
             intervals = intervals.astype(np.float32).values
