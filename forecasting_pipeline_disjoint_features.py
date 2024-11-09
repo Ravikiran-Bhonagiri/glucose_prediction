@@ -224,7 +224,7 @@ def pipeline_run(intervals, output_data, m_epochs, model_results, regression_con
             # Log the test metrics
             logging.info(f"Test Loss: {test_loss:.4f}, MAE: {test_mae:.4f}, MSE: {test_mse:.4f}, RMSE: {test_rmse:.4f}, MAPE: {test_mape:.4f}")
 
-            print(f"Test Loss: {test_loss:.4f}, MAE: {test_mae:.4f}, MSE: {test_mse:.4f}, RMSE: {test_rmse:.4f}, MAPE: {test_mape:.4f}")
+            print(f"Model-Name: {model_name} Test Loss: {test_loss:.4f}, MAE: {test_mae:.4f}, MSE: {test_mse:.4f}, RMSE: {test_rmse:.4f}, MAPE: {test_mape:.4f}")
 
 
             # Capture metrics for the current fold
@@ -235,6 +235,10 @@ def pipeline_run(intervals, output_data, m_epochs, model_results, regression_con
     # ----------------------------
     # Classical Regression Models
     # ----------------------------
+
+    X_full_flattened = intervals.reshape(intervals.shape[0], -1)
+    y_full = output_data_scaled.flatten()
+
     classical_models = {
         'XGBoost': XGBRegressor(**regression_config['XGBoost']),
         'RandomForest': RandomForestRegressor(**regression_config['RandomForest'])
@@ -246,8 +250,8 @@ def pipeline_run(intervals, output_data, m_epochs, model_results, regression_con
         for fold, (train_index, test_index) in enumerate(kf.split(intervals)):
             logging.info(f"Processing Fold {fold + 1} for model: {model_name}")
 
-            X_train, X_test = intervals[train_index], intervals[test_index]
-            y_train, y_test = output_data[train_index], output_data[test_index]
+            X_train, X_test = X_full_flattened[train_index], X_full_flattened[test_index]
+            y_train, y_test = y_full[train_index], y_full[test_index]
 
             # Train classical model
             model.fit(X_train, y_train)
@@ -260,7 +264,7 @@ def pipeline_run(intervals, output_data, m_epochs, model_results, regression_con
             test_mape = np.mean(np.abs((y_test - y_pred) / y_test)) * 100 if np.all(y_test) else float('inf')
             
             logging.info(f"{model_name} - MAE: {test_mae:.4f}, MSE: {test_mse:.4f}, RMSE: {test_rmse:.4f}, MAPE: {test_mape:.4f}")
-            print(f"{model_name} - MAE: {test_mae:.4f}, MSE: {test_mse:.4f}, RMSE: {test_rmse:.4f}, MAPE: {test_mape:.4f}")
+            print(f"Model-Name: {model_name} - MAE: {test_mae:.4f}, MSE: {test_mse:.4f}, RMSE: {test_rmse:.4f}, MAPE: {test_mape:.4f}")
 
             # Capture metrics for the current classical model
             model_results = capture_metrics(
