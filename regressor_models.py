@@ -38,9 +38,9 @@ class LSTMModel(nn.Module):
     - 2 LSTM layers with dropout for regularization.
     - Fully connected layers with ReLU activation to map LSTM output to a regression output.
     """
-    def __init__(self, input_size, hidden_size, dropout):
+    def __init__(self, input_size, hidden_size, dropout=0.1):
         super(LSTMModel, self).__init__()
-        self.lstm = nn.LSTM(input_size, hidden_size, num_layers=2, batch_first=True, dropout)
+        self.lstm = nn.LSTM(input_size, hidden_size, dropout, num_layers=2, batch_first=True)
         self.fc1 = nn.Linear(hidden_size, 64)
         self.fc2 = nn.Linear(64, 1)  # Single output for regression
     
