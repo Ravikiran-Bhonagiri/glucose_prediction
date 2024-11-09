@@ -338,6 +338,8 @@ for index, features in enumerate(list_of_features):
 
             intervals = last_48.astype(np.float32)
 
+            intervals = intervals.loc[:, ~intervals.columns.duplicated()]
+
             # Run the pipeline for forecasting
             model_results = pipeline_run(intervals, output_data, m_epochs, model_results, regression_config)
 
