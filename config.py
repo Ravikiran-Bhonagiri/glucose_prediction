@@ -55,6 +55,87 @@ classification_config = {
     }
 }
 
+# regression_config.py
+
+"""
+This configuration file defines the hyperparameters for various deep learning 
+and classical machine learning models used for regression tasks on sequential data.
+The configurations are designed to be flexible and can be adjusted based on 
+specific dataset requirements.
+"""
+
+# Configuration dictionary for regression models
+regression_config = {
+    # --------------------------------------------------------------
+    # LSTM Model Configuration
+    # --------------------------------------------------------------
+    "LSTMModel": {
+        "input_size": None,        # Number of input features per timestep (to be set dynamically)
+        "hidden_size": 128,        # Number of hidden units in each LSTM layer
+        "dropout": 0.2             # Dropout rate for regularization to prevent overfitting
+    },
+
+    # --------------------------------------------------------------
+    # Transformer Model Configuration
+    # --------------------------------------------------------------
+    "TransformerModel": {
+        "input_size": None,        # Number of input features per timestep (to be set dynamically)
+        "d_model": 128,            # Dimensionality of model embeddings (input projection size)
+        "num_heads": 4,            # Number of attention heads in the Transformer
+        "num_encoder_layers": 4,   # Number of Transformer encoder layers
+        "dim_feedforward": 512,    # Size of the feedforward network inside each encoder layer
+        "dropout": 0.1,            # Dropout rate for regularization
+        "max_seq_length": 500      # Maximum length of input sequences (for positional encoding)
+    },
+
+    # --------------------------------------------------------------
+    # CNN-LSTM Model Configuration
+    # --------------------------------------------------------------
+    "CNNLSTMModel": {
+        "input_size": None,        # Number of input features per timestep (to be set dynamically)
+        "num_filters": 64,         # Number of filters in the CNN layer
+        "kernel_size": 3,          # Size of the convolutional kernel (3 means a 3x1 filter)
+        "lstm_hidden_size": 128,   # Number of hidden units in the LSTM layer
+        "num_lstm_layers": 2,      # Number of stacked LSTM layers for deeper temporal learning
+        "dropout": 0.2             # Dropout rate for regularization
+    },
+
+    # --------------------------------------------------------------
+    # CNN Model Configuration
+    # --------------------------------------------------------------
+    "CNNModel": {
+        "input_size": None,        # Number of input features per timestep (to be set dynamically)
+        "num_filters": 64,         # Number of filters in the CNN layer for spatial feature extraction
+        "kernel_size": 3,          # Size of the convolutional kernel
+        "dropout": 0.2             # Dropout rate for regularization
+    },
+
+    # --------------------------------------------------------------
+    # Classical Machine Learning Models
+    # --------------------------------------------------------------
+    # Configuration for XGBoost Regressor
+    "XGBoost": {
+        "n_estimators": 100,               # Number of boosting rounds (trees)
+        "max_depth": 6,                    # Maximum depth of each tree
+        "learning_rate": 0.1,              # Learning rate (also known as eta)
+        "subsample": 0.8,                  # Fraction of samples to use for training each tree
+        "colsample_bytree": 0.8,           # Fraction of features to consider for each split
+        "objective": "reg:squarederror",   # Objective function for regression (minimizes squared error)
+        "eval_metric": "rmse"              # Evaluation metric used for early stopping
+    },
+
+    # Configuration for RandomForest Regressor
+    "RandomForest": {
+        "n_estimators": 200,               # Number of trees in the forest
+        "criterion": "squared_error",      # Criterion used to measure the quality of a split
+        "max_depth": None,                 # Maximum depth of the tree (None means nodes are expanded until all leaves are pure)
+        "min_samples_split": 2,            # Minimum number of samples required to split an internal node
+        "min_samples_leaf": 1,             # Minimum number of samples required to be at a leaf node
+        "bootstrap": True,                 # Whether bootstrap samples are used when building trees
+        "random_state": 42                 # Seed for reproducibility
+    }
+}
+
 
 
 
