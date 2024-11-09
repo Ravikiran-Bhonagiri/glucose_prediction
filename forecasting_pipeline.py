@@ -229,6 +229,42 @@ def pipeline_run(intervals, output_data, m_epochs, model_results, regression_con
                 np.array(test_true), np.array(test_pred), f"{model_name} (Test)", model_results
             )
 
+
+    # ----------------------------
+    # Classical Regression Models
+    # ----------------------------
+    classical_models = {
+        'XGBoost': XGBRegressor(**regression_config['XGBoost']),
+        'RandomForest': RandomForestRegressor(**regression_config['RandomForest'])
+    }
+
+    for model_name, model in classical_models.items():
+        logging.info(f"Starting training for classical model: {model_name}")
+
+        for fold, (train_index, test_index) in enumerate(kf.split(intervals)):
+            logging.info(f"Processing Fold {fold + 1} for model: {model_name}")
+
+            X_train, X_test = intervals[train_index], intervals[test_index]
+            y_train, y_test = output_data[train_index], output_data[test_index]
+
+            # Train classical model
+            model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
+
+            # Calculate test metrics
+            test_mae = mean_absolute_error(y_test, y_pred)
+            test_mse = mean_squared_error(y_test, y_pred)
+            test_rmse = np.sqrt(test_mse)
+            test_mape = np.mean(np.abs((y_test - y_pred) / y_test)) * 100 if np.all(y_test) else float('inf')
+            
+            logging.info(f"{model_name} - MAE: {test_mae:.4f}, MSE: {test_mse:.4f}, RMSE: {test_rmse:.4f}, MAPE: {test_mape:.4f}")
+            print(f"{model_name} - MAE: {test_mae:.4f}, MSE: {test_mse:.4f}, RMSE: {test_rmse:.4f}, MAPE: {test_mape:.4f}")
+
+            # Capture metrics for the current classical model
+            model_results = capture_metrics(
+                np.array(y_test), np.array(y_pred), f"{model_name} (Test)", model_results
+            )
+
     return model_results
 
 
