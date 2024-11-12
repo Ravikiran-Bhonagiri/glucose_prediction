@@ -98,5 +98,5 @@ for scenario, data in results.items():
     print(df.head())
 
     # Save to CSV file
-    df.to_csv(f"{scenario}_glucose_classification_counts.csv", index=False)
+    df.to_csv(f"{scenario.replace(" ", "_")}_glucose_classification_counts.csv", index=False)
     print(f"Saved {scenario} results to CSV.")
