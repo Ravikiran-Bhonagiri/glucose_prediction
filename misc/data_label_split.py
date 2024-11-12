@@ -22,11 +22,13 @@ def load_dataframe_from_npy(file_path):
     columns = data_dict['columns']
     data = data_dict['data']
     
+    '''
     # Ensure data is in the correct format for DataFrame creation
     if not isinstance(columns, list):
         raise TypeError("'columns' should be a list of column names.")
     if not isinstance(data, (list, np.ndarray)):
         raise TypeError("'data' should be a list or numpy array of rows.")
+    '''
     
     # Create and return the DataFrame
     return pd.DataFrame(data, columns=columns)
