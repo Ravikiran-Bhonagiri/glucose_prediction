@@ -247,25 +247,29 @@ def pipeline_run(intervals, output_data, m_epochs, model_results, regression_con
                     "feature_set": index
                 })
 
-            # Plot Actual vs Predicted values
+            # Create a new figure with a specified size
             plt.figure(figsize=(10, 6))
-            # Plotting the actual glucose levels with a solid blue line
-            plt.plot(y_test, label='Actual', linestyle='-', color='blue')
-
-            # Plotting the predicted glucose levels with a solid red line
-            plt.plot(y_pred, label='Predicted', linestyle='-', color='red')
-
+            
+            # Plot the actual glucose levels with a solid blue line
+            plt.plot(test_true, label='Actual', linestyle='-', color='blue')
+        
+            # Plot the predicted glucose levels with a solid red line
+            plt.plot(test_pred, label='Predicted', linestyle='-', color='red')
+        
             # Set plot title with model name and fold number
             plt.title(f"Actual vs Predicted Glucose Levels\nModel: {model_name}, Fold: {fold + 1}", fontsize=14)
             plt.xlabel("Input Interval")
             plt.ylabel("Glucose Level")
             plt.legend()
             plt.grid(True)
-
-            # Add text box with metrics in the plot
-            plt.figtext(0.15, -0.1, f"MAE: {test_mae:.4f}, MSE: {test_mse:.4f}, RMSE: {test_rmse:.4f}, MAPE: {test_mape:.4f}",
-                        fontsize=10, ha='left')
-
+            
+            # Adjust plot margins to fit the text box inside the figure area
+            plt.tight_layout()
+        
+            # Add text box with metrics at the bottom of the plot
+            plt.figtext(0.15, 0.02, f"MAE: {test_mae:.4f}, MSE: {test_mse:.4f}, RMSE: {test_rmse:.4f}, MAPE: {test_mape:.4f}",
+                        fontsize=10, ha='left', bbox=dict(facecolor='white', alpha=0.5))
+        
             # Save the current plot to the PDF
             pdf_pages.savefig()
             plt.close()
@@ -326,25 +330,29 @@ def pipeline_run(intervals, output_data, m_epochs, model_results, regression_con
                     "feature_set": index
                 })
 
-            # Plot Actual vs Predicted values
+            # Create a new figure with a specified size
             plt.figure(figsize=(10, 6))
-            # Plotting the actual glucose levels with a solid blue line
+            
+            # Plot the actual glucose levels with a solid blue line
             plt.plot(y_test, label='Actual', linestyle='-', color='blue')
-
-            # Plotting the predicted glucose levels with a solid red line
+        
+            # Plot the predicted glucose levels with a solid red line
             plt.plot(y_pred, label='Predicted', linestyle='-', color='red')
-
+        
             # Set plot title with model name and fold number
             plt.title(f"Actual vs Predicted Glucose Levels\nModel: {model_name}, Fold: {fold + 1}", fontsize=14)
             plt.xlabel("Input Interval")
             plt.ylabel("Glucose Level")
             plt.legend()
             plt.grid(True)
-
-            # Add text box with metrics in the plot
-            plt.figtext(0.15, -0.1, f"MAE: {test_mae:.4f}, MSE: {test_mse:.4f}, RMSE: {test_rmse:.4f}, MAPE: {test_mape:.4f}",
-                        fontsize=10, ha='left')
-
+            
+            # Adjust layout to fit the metrics text within the figure
+            plt.tight_layout()
+        
+            # Add a text box with metrics inside the plot area to avoid getting cut off
+            metrics_text = f"MAE: {test_mae:.4f}, MSE: {test_mse:.4f}, RMSE: {test_rmse:.4f}, MAPE: {test_mape:.4f}"
+            plt.figtext(0.5, -0.1, metrics_text, ha='center', fontsize=10, bbox=dict(facecolor='white', alpha=0.5))
+        
             # Save the current plot to the PDF
             pdf_pages.savefig()
             plt.close()
