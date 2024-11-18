@@ -66,11 +66,11 @@ def split_into_intervals(data, interval_size, stride):
 
 
 # Create a PDF file to save all the plots
-pdf_filename = "/home/rxb2495/glucose_predictions_all_subjects_lag_plots.pdf"
+pdf_filename = "/home/rxb2495/glucose_predictions_all_subjects_lag_plots_{current_time}.pdf"
 pdf_pages = PdfPages(pdf_filename)
 
 # CSV file to save actual vs predicted values
-csv_filename = "/home/rxb2495/glucose_predictions_lag_values.csv"
+csv_filename = "/home/rxb2495/glucose_predictions_lag_values_{current_time}.csv"
 csv_data = []
 
 
@@ -205,7 +205,7 @@ for index, features in enumerate(list_of_features):
         print(f"interval split {interval_split}")
         # Load data for the current features and interval split
 
-        for id_ in ["MMCS0002"]:
+        for id_ in ids:
             logging.info(f"Processing ID: {id_}")
 
             # Load features and labels
