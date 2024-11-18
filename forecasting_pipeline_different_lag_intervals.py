@@ -242,6 +242,9 @@ for index, features in enumerate(list_of_features):
 
             intervals = last_48.astype(np.float32)
 
+            print(f"intervals shape is {intervals.shape}")
+            logging.info(f"intervals shape is {intervals.shape}")
+
             # Run the pipeline for forecasting
             pipeline_run(intervals, output_data, m_epochs, regression_config, id_, index, lag_val)
 
