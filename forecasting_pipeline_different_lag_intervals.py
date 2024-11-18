@@ -205,7 +205,7 @@ for index, features in enumerate(list_of_features):
         print(f"interval split {interval_split}")
         # Load data for the current features and interval split
 
-        for id_ in ids:
+        for id_ in ["MMCS0002"]:
             logging.info(f"Processing ID: {id_}")
 
             # Load features and labels
