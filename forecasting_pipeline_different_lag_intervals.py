@@ -75,7 +75,7 @@ csv_data = []
 
 
 # Pipeline function for training models
-def pipeline_run(intervals, output_data, m_epochs, model_results, regression_config, id_, index, lag_val):
+def pipeline_run(intervals, output_data, m_epochs, regression_config, id_, index, lag_val):
     """
     Main pipeline function for training deep learning models using K-Fold cross-validation.
     This includes training, validation after every epoch, and a final test evaluation after all epochs.
@@ -161,7 +161,7 @@ def pipeline_run(intervals, output_data, m_epochs, model_results, regression_con
             pdf_pages.savefig()
             plt.close()
 
-    return model_results
+    return ""
 
 
 # Function to load data from .npy files
@@ -243,7 +243,7 @@ for index, features in enumerate(list_of_features):
             intervals = last_48.astype(np.float32)
 
             # Run the pipeline for forecasting
-            model_results = pipeline_run(intervals, output_data, m_epochs, model_results, regression_config, id_, index, lag_val)
+            pipeline_run(intervals, output_data, m_epochs, regression_config, id_, index, lag_val)
 
 
 # Save all the plots to the PDF file
