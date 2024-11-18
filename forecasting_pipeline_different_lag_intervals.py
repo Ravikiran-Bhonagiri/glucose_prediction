@@ -238,7 +238,10 @@ for index, features in enumerate(list_of_features):
             
             intervals = split_into_intervals(intervals, interval_size, interval_size)
             
-            last_48 = intervals[:, -(interval_split+lag_val):-lag_val, :]  # Last interval_split entries
+            if lag_val:
+                last_48 = intervals[:, -(interval_split+lag_val):-lag_val, :]  # Last interval_split entries
+            else:
+                last_48 = intervals[:, -interval_split:, :]  # Last interval_split entries
 
             intervals = last_48.astype(np.float32)
 
