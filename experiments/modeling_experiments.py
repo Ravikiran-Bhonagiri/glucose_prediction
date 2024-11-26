@@ -29,8 +29,99 @@ models = ["XGBoost"]
 current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 # Create a PDF file to save all the plots
-pdf_filename = f"{results_path}/glucose_predictions_plots.pdf"
+pdf_filename = f"{results_path}/glucose_predictions_plots_{current_datetime}.pdf"
 pdf_pages = PdfPages(pdf_filename)
+
+
+def extract_consecutive_entries_ending_at(
+    main_df,
+    minute_df,
+    time_column_main='Time',
+    time_column_minute='Time',
+    num_entries=1440,
+    lag=0,
+    fill_missing=False
+    ):
+    """
+    Extracts consecutive entries ending with each timestamp in the main_df from the minute-level dataframe.
+
+    Parameters:
+    - main_df (pd.DataFrame): DataFrame containing interval timestamps.
+    - minute_df (pd.DataFrame): DataFrame containing minute-level interval data.
+    - time_column_main (str): The column name of the time column in main_df.
+    - time_column_minute (str): The column name of the time column in minute_df.
+    - num_entries (int): The number of consecutive entries to extract (default is 15).
+    - fill_missing (bool): Whether to fill missing entries with NaNs if fewer than num_entries are found.
+
+    Returns:
+    - pd.DataFrame: A new DataFrame containing consecutive minute-level entries ending with each interval.
+    """
+    # Convert the time columns to datetime if not already
+    main_df[time_column_main] = pd.to_datetime(main_df[time_column_main])
+    minute_df[time_column_minute] = pd.to_datetime(minute_df[time_column_minute])
+
+    # Ensure both dataframes are sorted by time
+    main_df = main_df.sort_values(by=time_column_main)
+    minute_df = minute_df.sort_values(by=time_column_minute)
+
+    print(main_df.shape)
+    print(minute_df.shape)
+
+    # Initialize an empty list to store the results
+    extracted_data = []
+
+    # Create a set of minute-level indices for faster lookups
+    minute_df_index_set = set(minute_df[time_column_minute])
+
+    # Loop through each interval in the main dataframe
+    for time_entry in main_df[time_column_main]:
+        # Calculate the start time for the desired number of entries
+        start_time = time_entry - pd.Timedelta(minutes=(num_entries-1)) - pd.Timedelta(minutes=lag)
+        time_entry = time_entry - pd.Timedelta(minutes=lag)
+
+        # Extract the relevant rows from the minute-level dataframe
+        # Using a slice of minute_df with start_time and time_entry
+        extracted_rows = minute_df.loc[
+            (minute_df[time_column_minute] >= start_time) &
+            (minute_df[time_column_minute] <= time_entry)
+        ]
+
+        extracted_rows.set_index(time_column_minute, inplace=True)
+
+        # Get the minimum and maximum times
+        min_time = extracted_rows.index.min()
+        #max_time = extracted_rows.index.max()
+
+        #print(f"Minimum time: {min_time}")
+        #print(f"Maximum time: {max_time}")
+
+        #extracted_rows = extracted_rows.reset_index()
+
+        # Resample to 15-minute intervals and aggregate using mean
+        extracted_rows = extracted_rows.resample("15T", origin=min_time).mean()
+
+        #print(start_time)
+        #print(time_entry)
+        # Get the minimum and maximum times
+
+        #extracted_rows.set_index(time_column_minute, inplace=True)
+
+        #min_time = extracted_rows.index.min()
+        #max_time = extracted_rows.index.max()
+
+        #print(f"Minimum time: {min_time}")
+        #print(f"Maximum time: {max_time}")
+
+        #print(extracted_rows.shape)
+
+        has_nan = extracted_rows.isnull().values.any()
+        if has_nan:
+          print(f"Does extracted_rows contain NaN values? {has_nan}")
+
+
+        extracted_data.append(extracted_rows.to_numpy())
+
+    return np.array(extracted_data), main_df[["Historic Glucose mg/dL"]].to_numpy()
 
 def perform_kfold_cv(features, labels, model, model_name, lag, id, k_splits=5):
 
@@ -67,7 +158,7 @@ def perform_kfold_cv(features, labels, model, model_name, lag, id, k_splits=5):
         # Plot Actual vs Predicted values
         plt.figure(figsize=(10, 6))
         # Plotting the actual glucose levels with a solid blue line
-        plt.plot(y_test, label='Actual', linestyle='-', color='blue')
+        plt.plot(y_val, label='Actual', linestyle='-', color='blue')
 
         # Plotting the predicted glucose levels with a solid red line
         plt.plot(y_pred, label='Predicted', linestyle='-', color='red')
@@ -115,7 +206,7 @@ xgb_params = {
     "eval_metric": "rmse"              # Evaluation metric used for early stopping
 }
 
-model = xgb.XGBRegressor(**xgb_params)
+model = XGBRegressor(**xgb_params)
 
 # Initialize K-Fold Cross-Validation
 kfold = KFold(n_splits=5, shuffle=True, random_state=42)
@@ -129,7 +220,7 @@ for id in ids:
       df_features = pd.read_csv(f'{file_path}/{id}_feature_engineered_data.csv')
       features, labels = extract_consecutive_entries_ending_at(
           df_glucose_filtered,
-          df_features[final_features],
+          df_features,
           time_column_main='Device Timestamp',
           time_column_minute='Time',
           num_entries=1440,
@@ -144,17 +235,12 @@ pdf_pages.close()
 
 # Convert to a DataFrame
 df = pd.DataFrame(final_data)
-
 # Save the DataFrame to a CSV file
 csv_file = f"{results_path}/captured_metrics_{current_datetime}.csv"
 df.to_csv(csv_file, index=False)
-
 print(f"Metrics saved to {csv_file}")
 
 df_preds_vs_actuals = pd.DataFrame(preds_vs_actuals)
-
 csv_file_preds_vs_actuals = f"{results_path}/captured_preds_vs_actuals_{current_datetime}.csv"
-
 df_preds_vs_actuals.to_csv(csv_file_preds_vs_actuals, index=False)
-
 print(f"Predictions vs. Actuals saved to {csv_file_preds_vs_actuals}")
