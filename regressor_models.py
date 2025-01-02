@@ -2,9 +2,7 @@
 models.py
 
 This file contains definitions for various neural network models designed for regression
-tasks on sequential data, such as time series forecasting. These models are built to capture
-complex spatial and temporal dependencies using combinations of convolutional, LSTM, and
-Transformer layers.
+tasks on sequential data, such as time series forecasting. 
 
 Models included:
     1. LSTMModel: A basic LSTM-based model with stacked LSTM layers.
@@ -15,7 +13,6 @@ Models included:
 Author: Ravikiran Bhonagiri
 Date: 9th November, 2024
 """
-
 import torch
 import torch.nn as nn
 import math
